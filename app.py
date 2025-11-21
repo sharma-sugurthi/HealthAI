@@ -30,9 +30,9 @@ def init_gemini():
 
 db = init_database()
 
-# Check if GEMINI_API_KEY is available
-if not os.environ.get('GEMINI_API_KEY'):
-    st.error("⚠️ GEMINI_API_KEY not found. Please add your Google Gemini API key in the Secrets tab.")
+# Check if GOOGLE_API_KEY or GEMINI_API_KEY is available
+if not (os.environ.get('GOOGLE_API_KEY') or os.environ.get('GEMINI_API_KEY')):
+    st.error("⚠️ GOOGLE_API_KEY not found. Please add your Google Gemini API key in the Secrets tab.")
     st.stop()
 
 gemini = init_gemini()
@@ -138,11 +138,9 @@ def patient_chat_page():
     # Load chat history
     if not st.session_state.chat_messages:
         history = db.get_chat_history(st.session_state.user['id'], limit=20)
-        st.session_state.chat_messages = [
-            {"role": "user" if i % 2 == 0 else "assistant", 
-             "content": h.message if i % 2 == 0 else h.response}
-            for i, h in enumerate(reversed(history))
-        ]
+        for h in reversed(history):
+            st.session_state.chat_messages.append({"role": "user", "content": h.message})
+            st.session_state.chat_messages.append({"role": "assistant", "content": h.response})
     
     # Display chat messages
     for message in st.session_state.chat_messages:
@@ -218,6 +216,12 @@ def treatment_plan_page():
     """Treatment plan generator"""
     st.title("📋 Treatment Plans")
     
+    # Initialize session state for generated plan
+    if 'generated_plan' not in st.session_state:
+        st.session_state.generated_plan = None
+    if 'plan_condition' not in st.session_state:
+        st.session_state.plan_condition = None
+    
     tab1, tab2 = st.tabs(["Generate New Plan", "View Saved Plans"])
     
     with tab1:
@@ -240,26 +244,39 @@ def treatment_plan_page():
                         }
                         
                         plan = gemini.generate_treatment_plan(condition, patient_info)
-                        
-                        st.markdown("### Generated Treatment Plan")
-                        st.markdown(plan)
-                        
-                        # Option to save plan
-                        plan_title = st.text_input("Save this plan as:", value=f"Treatment Plan for {condition}")
-                        
-                        if st.button("Save Plan"):
-                            try:
-                                db.create_treatment_plan(
-                                    user_id=st.session_state.user['id'],
-                                    title=plan_title,
-                                    condition=condition,
-                                    plan_details=plan
-                                )
-                                st.success("Treatment plan saved successfully!")
-                            except Exception as e:
-                                st.error(f"Failed to save plan: {str(e)}")
+                        st.session_state.generated_plan = plan
+                        st.session_state.plan_condition = condition
                     else:
                         st.error("AI assistant is currently unavailable.")
+        
+        # Display generated plan if available
+        if st.session_state.generated_plan:
+            st.markdown("### Generated Treatment Plan")
+            st.markdown(st.session_state.generated_plan)
+            
+            # Option to save plan
+            plan_title = st.text_input("Save this plan as:", value=f"Treatment Plan for {st.session_state.plan_condition}")
+            
+            col1, col2 = st.columns([1, 4])
+            with col1:
+                if st.button("Save Plan"):
+                    try:
+                        db.create_treatment_plan(
+                            user_id=st.session_state.user['id'],
+                            title=plan_title,
+                            condition=st.session_state.plan_condition,
+                            plan_details=st.session_state.generated_plan
+                        )
+                        st.success("Treatment plan saved successfully!")
+                        st.session_state.generated_plan = None
+                        st.session_state.plan_condition = None
+                    except Exception as e:
+                        st.error(f"Failed to save plan: {str(e)}")
+            with col2:
+                if st.button("Clear"):
+                    st.session_state.generated_plan = None
+                    st.session_state.plan_condition = None
+                    st.rerun()
     
     with tab2:
         st.subheader("Your Saved Treatment Plans")

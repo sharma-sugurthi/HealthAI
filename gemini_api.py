@@ -17,10 +17,10 @@ class GeminiAPI:
     def __init__(self, max_retries=3, retry_delay=2):
         self.max_retries = max_retries
         self.retry_delay = retry_delay
-        self.api_key = os.environ.get('GEMINI_API_KEY')
+        self.api_key = os.environ.get('GOOGLE_API_KEY') or os.environ.get('GEMINI_API_KEY')
         
         if not self.api_key:
-            raise ValueError("GEMINI_API_KEY not found in environment variables")
+            raise ValueError("GOOGLE_API_KEY or GEMINI_API_KEY not found in environment variables")
         
         genai.configure(api_key=self.api_key)
         
