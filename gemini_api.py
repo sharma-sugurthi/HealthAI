@@ -24,8 +24,9 @@ class GeminiAPI:
         
         genai.configure(api_key=self.api_key)
         
-        # Use gemini-pro for text generation
-        self.model = genai.GenerativeModel('gemini-pro')
+        # Use gemini-2.0-flash-exp for text generation (newer model)
+        # Note: gemini-pro is deprecated, using latest available model
+        self.model = genai.GenerativeModel('gemini-2.0-flash-exp')
         
         # Configure safety settings to be more permissive for medical content
         self.safety_settings = [
