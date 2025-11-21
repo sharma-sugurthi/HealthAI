@@ -1,20 +1,21 @@
 # HealthAI - Intelligent Healthcare Assistant
 
 ## Overview
-HealthAI is a comprehensive web application built with Streamlit that serves as an intelligent healthcare assistant. The app leverages Google's Gemini Pro AI model to provide accurate, reliable, and context-aware medical assistance to users.
+HealthAI is a comprehensive web application built with Streamlit that serves as an intelligent healthcare assistant. The app leverages xAI's Grok 4.1 Fast model via OpenRouter to provide accurate, reliable, and context-aware medical assistance to users.
 
 **Purpose:** Provide users with AI-powered health information, symptom analysis, treatment planning, and health tracking capabilities.
 
-**Current State:** Fully functional MVP with all core features implemented.
+**Current State:** Fully functional MVP with all core features implemented using OpenRouter API.
 
 ## Recent Changes
-- **2025-11-21:** Initial implementation of complete HealthAI application
+- **2025-11-21:** Complete implementation of HealthAI application
   - User authentication system with bcrypt password hashing
-  - AI-powered patient chat using Google Gemini Pro
+  - AI-powered patient chat using xAI's Grok 4.1 Fast (via OpenRouter)
   - Symptom checker with detailed analysis
   - Treatment plan generator and storage
   - Health analytics dashboard with Plotly visualizations
   - SQLite database with SQLAlchemy ORM for data persistence
+  - Migrated from Google Gemini to OpenRouter for better reliability and free access
 
 ## Core Features
 
@@ -25,9 +26,9 @@ HealthAI is a comprehensive web application built with Streamlit that serves as 
 - User profile data: username, password, full name, age, gender
 
 ### 2. AI-Powered Patient Chat
-- Real-time Q&A with Google Gemini Pro
+- Real-time Q&A with xAI's Grok 4.1 Fast
 - Context-aware responses for health-related queries
-- Chat history persistence
+- Chat history persistence in database
 - Empathetic and informative AI responses
 - Medical disclaimers included in all responses
 
@@ -78,7 +79,7 @@ HealthAI is a comprehensive web application built with Streamlit that serves as 
 healthai/
 ├── app.py              # Main Streamlit application
 ├── db.py              # Database models and operations
-├── gemini_api.py      # Gemini API integration
+├── gemini_api.py      # OpenRouter API integration (Grok 4.1 Fast)
 ├── healthai.db        # SQLite database (created on first run)
 ├── replit.md          # This documentation file
 └── .streamlit/
@@ -87,11 +88,12 @@ healthai/
 
 ### Technology Stack
 - **Frontend:** Streamlit (Python web framework)
-- **AI Model:** Google Gemini Pro (via google-generativeai)
+- **AI Model:** xAI Grok 4.1 Fast via OpenRouter (2M context, free)
 - **Database:** SQLite with SQLAlchemy ORM
 - **Authentication:** bcrypt for password hashing
 - **Visualization:** Plotly for interactive charts
 - **Data Processing:** Pandas for data manipulation
+- **AI Client:** OpenAI Python library (compatible with OpenRouter)
 
 ### Database Schema
 
@@ -131,26 +133,36 @@ healthai/
 ## Environment Variables
 
 ### Required Secrets
-- `GEMINI_API_KEY`: Google Gemini API key for AI functionality
-  - Get your free key at: https://aistudio.google.com/app/apikey
+- `OPENROUTER_API_KEY`: OpenRouter API key for AI functionality
+  - Get your free key at: https://openrouter.ai/keys
+  - Provides access to xAI's Grok 4.1 Fast model (free, 2M context window)
 
 ### Optional Variables
 - `SESSION_SECRET`: Used for session management (automatically configured)
 
 ## API Integration
 
-### Gemini API Features
-- **Model:** gemini-pro (text generation)
-- **Safety Settings:** Configured to allow medical content while maintaining safety
+### OpenRouter Features
+- **Provider:** OpenRouter (https://openrouter.ai)
+- **Model:** x-ai/grok-4.1-fast
+- **Context Window:** 2 million tokens
+- **Cost:** FREE ($0/M input and output tokens)
+- **Capabilities:** Advanced reasoning, tool calling, excellent for healthcare Q&A
 - **Retry Logic:** 3 attempts with exponential backoff
 - **Error Handling:** Graceful fallbacks with user-friendly error messages
-- **Rate Limiting:** Built-in handling for API rate limits
 
 ### API Functions
 1. `chat_with_patient()` - General health Q&A
 2. `analyze_symptoms()` - Symptom analysis and condition suggestions
 3. `generate_treatment_plan()` - Personalized treatment recommendations
 4. `get_health_advice()` - General health information
+
+### Why OpenRouter + Grok 4.1 Fast?
+- **Free Access:** No API costs, perfect for healthcare applications
+- **Large Context:** 2M token context window handles complex medical conversations
+- **Reliability:** OpenRouter provides automatic failover and load balancing
+- **Performance:** Grok 4.1 Fast is optimized for real-world use cases like customer support
+- **OpenAI Compatible:** Uses standard OpenAI Python library for easy integration
 
 ## Security Considerations
 
@@ -176,7 +188,7 @@ healthai/
 
 2. **Patient Chat**
    - Ask health-related questions
-   - Receive AI-powered responses
+   - Receive AI-powered responses from Grok 4.1 Fast
    - Chat history automatically saved
 
 3. **Symptom Checker**
@@ -224,7 +236,7 @@ Planned features for future iterations:
 - [ ] User registration with valid data
 - [ ] User login with correct credentials
 - [ ] Login failure with incorrect credentials
-- [ ] Patient chat conversation flow
+- [ ] Patient chat conversation flow with AI responses
 - [ ] Symptom checker analysis
 - [ ] Treatment plan generation and saving
 - [ ] Health metric recording
@@ -233,8 +245,7 @@ Planned features for future iterations:
 - [ ] Logout functionality
 
 ### Known Limitations
-- AI responses depend on Gemini API availability
-- Safety filters may occasionally block legitimate medical queries
+- AI responses depend on OpenRouter API availability
 - Chart performance may vary with large datasets (>1000 points)
 - Single-user session (no concurrent multi-device support)
 
@@ -242,14 +253,15 @@ Planned features for future iterations:
 
 ### Common Issues
 
-**"GEMINI_API_KEY not found"**
-- Add your Gemini API key in Replit Secrets tab
-- Key name must be exactly: GEMINI_API_KEY
+**"OPENROUTER_API_KEY not found"**
+- Add your OpenRouter API key in Replit Secrets tab
+- Get free key at: https://openrouter.ai/keys
+- Key name must be exactly: OPENROUTER_API_KEY
 
 **"Failed to initialize AI assistant"**
 - Check API key is valid
 - Verify internet connection
-- Check Gemini API quota/limits
+- Check OpenRouter service status
 
 **Database errors**
 - Delete healthai.db file to reset database
@@ -262,7 +274,8 @@ Planned features for future iterations:
 
 ## Support and Resources
 
-- Google Gemini API Documentation: https://ai.google.dev/docs
+- OpenRouter Documentation: https://openrouter.ai/docs
+- Grok 4.1 Fast Model Info: https://openrouter.ai/x-ai/grok-4.1-fast
 - Streamlit Documentation: https://docs.streamlit.io
 - SQLAlchemy Documentation: https://docs.sqlalchemy.org
 - Plotly Documentation: https://plotly.com/python/

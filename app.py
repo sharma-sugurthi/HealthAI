@@ -30,9 +30,10 @@ def init_gemini():
 
 db = init_database()
 
-# Check if GOOGLE_API_KEY or GEMINI_API_KEY is available
-if not (os.environ.get('GOOGLE_API_KEY') or os.environ.get('GEMINI_API_KEY')):
-    st.error("⚠️ GOOGLE_API_KEY not found. Please add your Google Gemini API key in the Secrets tab.")
+# Check if OPENROUTER_API_KEY is available
+if not os.environ.get('OPENROUTER_API_KEY'):
+    st.error("⚠️ OPENROUTER_API_KEY not found. Please add your OpenRouter API key in the Secrets tab.")
+    st.info("Get your free API key at: https://openrouter.ai/keys")
     st.stop()
 
 gemini = init_gemini()

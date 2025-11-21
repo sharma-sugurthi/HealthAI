@@ -2,75 +2,66 @@ import os
 import time
 import logging
 from typing import Optional
-import google.generativeai as genai
+from openai import OpenAI
 
-# IMPORTANT: Integration with blueprint:python_gemini
-# Using Google Gemini API for AI-powered healthcare assistance
+# Using OpenRouter API for AI-powered healthcare assistance
+# OpenRouter provides access to multiple AI models including xAI's Grok
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 
 class GeminiAPI:
-    """Handles all Gemini API interactions with error handling and retry logic"""
+    """Handles all AI API interactions with error handling and retry logic via OpenRouter"""
     
     def __init__(self, max_retries=3, retry_delay=2):
         self.max_retries = max_retries
         self.retry_delay = retry_delay
-        self.api_key = os.environ.get('GOOGLE_API_KEY') or os.environ.get('GEMINI_API_KEY')
+        self.api_key = os.environ.get('OPENROUTER_API_KEY')
         
         if not self.api_key:
-            raise ValueError("GOOGLE_API_KEY or GEMINI_API_KEY not found in environment variables")
+            raise ValueError("OPENROUTER_API_KEY not found in environment variables")
         
-        genai.configure(api_key=self.api_key)
-        
-        # Use gemini-2.0-flash-exp for text generation (newer model)
-        # Note: gemini-pro is deprecated, using latest available model
-        self.model = genai.GenerativeModel('gemini-2.0-flash-exp')
-        
-        # Configure safety settings to be more permissive for medical content
-        self.safety_settings = [
-            {
-                "category": "HARM_CATEGORY_HARASSMENT",
-                "threshold": "BLOCK_ONLY_HIGH"
-            },
-            {
-                "category": "HARM_CATEGORY_HATE_SPEECH",
-                "threshold": "BLOCK_ONLY_HIGH"
-            },
-            {
-                "category": "HARM_CATEGORY_SEXUALLY_EXPLICIT",
-                "threshold": "BLOCK_ONLY_HIGH"
-            },
-            {
-                "category": "HARM_CATEGORY_DANGEROUS_CONTENT",
-                "threshold": "BLOCK_ONLY_HIGH"
+        # Initialize OpenAI client with OpenRouter endpoint
+        self.client = OpenAI(
+            base_url="https://openrouter.ai/api/v1",
+            api_key=self.api_key,
+            default_headers={
+                "HTTP-Referer": "https://healthai.replit.app",
+                "X-Title": "HealthAI Assistant"
             }
-        ]
+        )
+        
+        # Use xAI's Grok 4.1 Fast - free model with 2M context window
+        self.model_name = "x-ai/grok-4.1-fast"
     
     def _make_request(self, prompt: str, system_instruction: Optional[str] = None) -> str:
-        """Make a request to Gemini API with retry logic"""
+        """Make a request to OpenRouter API with retry logic"""
         
-        full_prompt = prompt
+        # Build messages array for OpenAI-compatible format
+        messages = []
         if system_instruction:
-            full_prompt = f"{system_instruction}\n\n{prompt}"
+            messages.append({"role": "system", "content": system_instruction})
+        messages.append({"role": "user", "content": prompt})
         
         for attempt in range(self.max_retries):
             try:
-                response = self.model.generate_content(
-                    full_prompt,
-                    safety_settings=self.safety_settings
+                response = self.client.chat.completions.create(
+                    model=self.model_name,
+                    messages=messages,
+                    temperature=0.7,
+                    max_tokens=2000
                 )
                 
-                # Check if response was blocked
-                if not response.text:
-                    if hasattr(response, 'prompt_feedback'):
-                        logger.warning(f"Response blocked: {response.prompt_feedback}")
-                        return "I apologize, but I cannot provide a response to this query due to safety filters. Please rephrase your question or consult a healthcare professional directly."
+                # Extract response content
+                if response.choices and len(response.choices) > 0:
+                    content = response.choices[0].message.content
+                    if content:
+                        return content
                     else:
                         return "I apologize, but I couldn't generate a response. Please try again or rephrase your question."
-                
-                return response.text
+                else:
+                    return "I apologize, but I couldn't generate a response. Please try again."
                 
             except Exception as e:
                 logger.error(f"Attempt {attempt + 1} failed: {str(e)}")
