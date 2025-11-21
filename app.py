@@ -365,7 +365,7 @@ def health_analytics_page():
                 {
                     'Date': m.recorded_at,
                     'Value': m.value,
-                    'Notes': m.notes or ''
+                    'Notes': str(m.notes) if m.notes else ''
                 }
                 for m in reversed(metrics)
             ])
