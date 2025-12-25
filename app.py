@@ -6,6 +6,10 @@ from datetime import datetime, timedelta
 from db import DatabaseManager, User
 from gemini_api import get_gemini_client
 import os
+from dotenv import load_dotenv
+
+# Load environment variables from .env file
+load_dotenv()
 
 # Page configuration
 st.set_page_config(

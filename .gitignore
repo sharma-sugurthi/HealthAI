@@ -1,0 +1,44 @@
+# Environment variables
+.env
+.env.local
+
+# Virtual environments
+.venv/
+venv/
+env/
+
+# Python cache
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+
+# Database files
+*.db
+*.sqlite
+*.sqlite3
+healthai.db
+
+# IDE files
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+
+# Temporary files
+.tmp/
+temp/
+
+# Replit specific
+.local/
+
+# Streamlit config (if contains secrets)
+.streamlit/secrets.toml
