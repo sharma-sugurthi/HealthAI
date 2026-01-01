@@ -37,7 +37,7 @@ jobs:
       run: black --check .
     
     - name: Run Flake8
-      run: flake8 backend/ api/ tests/ --max-line-length=100 --exclude=__pycache__,.venv
+      run: flake8 backend/ api/ tests/
     
     - name: Run isort
       run: isort --check-only .
