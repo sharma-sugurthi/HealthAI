@@ -3,6 +3,7 @@ import time
 import logging
 from typing import Optional
 from openai import OpenAI
+from config import config
 
 # Using OpenRouter API for AI-powered healthcare assistance
 # OpenRouter provides access to multiple AI models including xAI's Grok
@@ -11,13 +12,13 @@ logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 
-class GeminiAPI:
+class HealthAIClient:
     """Handles all AI API interactions with error handling and retry logic via OpenRouter"""
     
-    def __init__(self, max_retries=3, retry_delay=2):
-        self.max_retries = max_retries
-        self.retry_delay = retry_delay
-        self.api_key = os.environ.get('OPENROUTER_API_KEY')
+    def __init__(self, max_retries=None, retry_delay=None):
+        self.max_retries = max_retries or config.AI_MAX_RETRIES
+        self.retry_delay = retry_delay or config.AI_RETRY_DELAY
+        self.api_key = config.OPENROUTER_API_KEY
         
         if not self.api_key:
             raise ValueError("OPENROUTER_API_KEY not found in environment variables")
@@ -27,13 +28,13 @@ class GeminiAPI:
             base_url="https://openrouter.ai/api/v1",
             api_key=self.api_key,
             default_headers={
-                "HTTP-Referer": "https://healthai.replit.app",
-                "X-Title": "HealthAI Assistant"
+                "HTTP-Referer": "https://healthai.app",
+                "X-Title": config.APP_NAME
             }
         )
         
-        # Use xAI's Grok 4.1 Fast - free model with 2M context window
-        self.model_name = "x-ai/grok-4.1-fast"
+        # Use configured AI model
+        self.model_name = config.AI_MODEL
     
     def _make_request(self, prompt: str, system_instruction: Optional[str] = None) -> str:
         """Make a request to OpenRouter API with retry logic"""
@@ -49,8 +50,8 @@ class GeminiAPI:
                 response = self.client.chat.completions.create(
                     model=self.model_name,
                     messages=messages,
-                    temperature=0.7,
-                    max_tokens=2000
+                    temperature=config.AI_TEMPERATURE,
+                    max_tokens=config.AI_MAX_TOKENS
                 )
                 
                 # Extract response content
@@ -143,10 +144,10 @@ Keep responses informative but accessible to general audiences."""
         return self._make_request(prompt, system_instruction)
 
 
-def get_gemini_client() -> Optional[GeminiAPI]:
-    """Factory function to get Gemini API client with error handling"""
+def get_ai_client() -> Optional[HealthAIClient]:
+    """Factory function to get AI client with error handling"""
     try:
-        return GeminiAPI()
+        return HealthAIClient()
     except Exception as e:
-        logger.error(f"Failed to initialize Gemini API: {str(e)}")
+        logger.error(f"Failed to initialize AI client: {str(e)}")
         return None

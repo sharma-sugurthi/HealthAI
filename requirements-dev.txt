@@ -1,0 +1,18 @@
+# Development dependencies for testing and code quality
+pytest>=7.4.0
+pytest-cov>=4.1.0
+black>=23.0.0
+flake8>=6.0.0
+isort>=5.12.0
+mypy>=1.5.0
+pre-commit>=3.3.0
+
+# Database migrations
+alembic>=1.12.0
+
+# API and authentication
+fastapi>=0.104.0
+uvicorn[standard]>=0.24.0
+python-jose[cryptography]>=3.3.0
+python-multipart>=0.0.6
+slowapi>=0.1.9

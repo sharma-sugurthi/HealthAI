@@ -1,54 +1,64 @@
+"""
+HealthAI Frontend - Streamlit Application
+Uses service layer for all business logic and data access.
+"""
 import streamlit as st
 import pandas as pd
 import plotly.graph_objects as go
-import plotly.express as px
-from datetime import datetime, timedelta
-from db import DatabaseManager, User
-from ai_client import get_ai_client
+from datetime import datetime
+import sys
 import os
-from dotenv import load_dotenv
 
-# Load environment variables from .env file
-load_dotenv()
+# Add parent directory to path for imports
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+
+from backend.services.auth_service import AuthService
+from backend.services.chat_service import ChatService
+from backend.services.health_service import HealthService
+from backend.services.treatment_service import TreatmentService
+from backend.utils.database import get_db_manager
+from backend.utils.logger import get_logger
+from backend.exceptions.auth_exceptions import InvalidCredentialsError, UserAlreadyExistsError
+from backend.exceptions.validation_exceptions import ValidationError
+from config import config
+
+# Initialize logger
+logger = get_logger(__name__)
 
 # Page configuration
 st.set_page_config(
-    page_title="HealthAI - Intelligent Healthcare Assistant",
+    page_title=f"{config.APP_NAME} - Intelligent Healthcare Assistant",
     page_icon="🏥",
     layout="wide",
     initial_sidebar_state="expanded"
 )
 
-# Initialize database and Gemini API
+# Initialize database manager
 @st.cache_resource
-def init_database():
-    return DatabaseManager()
-
-@st.cache_resource
-def init_ai_client():
+def init_services():
+    """Initialize database and return service instances"""
     try:
-        return get_ai_client()
+        db_manager = get_db_manager()
+        logger.info("Database initialized successfully")
+        return db_manager
     except Exception as e:
-        st.error(f"Failed to initialize AI assistant: {str(e)}")
-        return None
+        logger.error(f"Failed to initialize database: {str(e)}")
+        st.error(f"Failed to initialize application: {str(e)}")
+        st.stop()
 
-db = init_database()
+db_manager = init_services()
 
-# Check if OPENROUTER_API_KEY is available
-if not os.environ.get('OPENROUTER_API_KEY'):
-    st.error("⚠️ OPENROUTER_API_KEY not found. Please add your OpenRouter API key in the Secrets tab.")
+# Check API key
+if not config.OPENROUTER_API_KEY:
+    st.error("⚠️ OPENROUTER_API_KEY not found. Please add your OpenRouter API key in .env file.")
     st.info("Get your free API key at: https://openrouter.ai/keys")
     st.stop()
-
-gemini = init_ai_client()
 
 # Session state initialization
 if 'logged_in' not in st.session_state:
     st.session_state.logged_in = False
 if 'user' not in st.session_state:
     st.session_state.user = None
-if 'page' not in st.session_state:
-    st.session_state.page = 'chat'
 if 'chat_messages' not in st.session_state:
     st.session_state.chat_messages = []
 
@@ -65,7 +75,7 @@ def show_medical_disclaimer():
 
 def login_page():
     """Display login/registration page"""
-    st.title("🏥 HealthAI - Intelligent Healthcare Assistant")
+    st.title(f"🏥 {config.APP_NAME} - Intelligent Healthcare Assistant")
     
     st.markdown("""
     Welcome to HealthAI, your intelligent healthcare companion powered by advanced AI technology.
@@ -90,20 +100,26 @@ def login_page():
             if not login_username or not login_password:
                 st.error("Please enter both username and password")
             else:
-                user = db.authenticate_user(login_username, login_password)
-                if user:
+                try:
+                    session = db_manager.get_session()
+                    auth_service = AuthService(session)
+                    user_data = auth_service.login_user(login_username, login_password)
+                    
                     st.session_state.logged_in = True
-                    st.session_state.user = {
-                        'id': user.id,
-                        'username': user.username,
-                        'full_name': user.full_name,
-                        'age': user.age,
-                        'gender': user.gender
-                    }
-                    st.success(f"Welcome back, {user.full_name}!")
+                    st.session_state.user = user_data
+                    st.success(f"Welcome back, {user_data['full_name']}!")
+                    logger.info(f"User logged in: {login_username}")
                     st.rerun()
-                else:
+                    
+                except InvalidCredentialsError:
                     st.error("Invalid username or password")
+                except ValidationError as e:
+                    st.error(str(e))
+                except Exception as e:
+                    logger.error(f"Login error: {str(e)}")
+                    st.error("An error occurred during login. Please try again.")
+                finally:
+                    session.close()
     
     with tab2:
         st.subheader("Create New Account")
@@ -119,11 +135,11 @@ def login_page():
                 st.error("Please fill in all required fields")
             elif reg_password != reg_password_confirm:
                 st.error("Passwords do not match")
-            elif len(reg_password) < 6:
-                st.error("Password must be at least 6 characters long")
             else:
                 try:
-                    user = db.create_user(
+                    session = db_manager.get_session()
+                    auth_service = AuthService(session)
+                    auth_service.register_user(
                         username=reg_username,
                         password=reg_password,
                         full_name=reg_full_name,
@@ -131,8 +147,17 @@ def login_page():
                         gender=reg_gender
                     )
                     st.success("Account created successfully! Please login.")
+                    logger.info(f"New user registered: {reg_username}")
+                    
+                except UserAlreadyExistsError as e:
+                    st.error(str(e))
+                except ValidationError as e:
+                    st.error(str(e))
                 except Exception as e:
+                    logger.error(f"Registration error: {str(e)}")
                     st.error(f"Registration failed: {str(e)}")
+                finally:
+                    session.close()
 
 
 def patient_chat_page():
@@ -142,10 +167,18 @@ def patient_chat_page():
     
     # Load chat history
     if not st.session_state.chat_messages:
-        history = db.get_chat_history(st.session_state.user['id'], limit=20)
-        for h in reversed(history):
-            st.session_state.chat_messages.append({"role": "user", "content": h.message})
-            st.session_state.chat_messages.append({"role": "assistant", "content": h.response})
+        try:
+            session = db_manager.get_session()
+            chat_service = ChatService(session)
+            history = chat_service.get_chat_history(st.session_state.user['id'], limit=20)
+            
+            for h in history:
+                st.session_state.chat_messages.append({"role": "user", "content": h['message']})
+                st.session_state.chat_messages.append({"role": "assistant", "content": h['response']})
+            
+            session.close()
+        except Exception as e:
+            logger.error(f"Error loading chat history: {str(e)}")
     
     # Display chat messages
     for message in st.session_state.chat_messages:
@@ -162,19 +195,21 @@ def patient_chat_page():
         # Get AI response
         with st.chat_message("assistant"):
             with st.spinner("Thinking..."):
-                if gemini:
-                    response = gemini.chat_with_patient(prompt)
-                else:
-                    response = "I'm currently unavailable. Please try again later."
-                
-                st.markdown(response)
-                st.session_state.chat_messages.append({"role": "assistant", "content": response})
-                
-                # Save to database
                 try:
-                    db.add_chat_message(st.session_state.user['id'], prompt, response)
+                    session = db_manager.get_session()
+                    chat_service = ChatService(session)
+                    result = chat_service.send_message(st.session_state.user['id'], prompt)
+                    response = result['response']
+                    
+                    st.markdown(response)
+                    st.session_state.chat_messages.append({"role": "assistant", "content": response})
+                    
+                    session.close()
                 except Exception as e:
-                    st.error(f"Failed to save chat: {str(e)}")
+                    logger.error(f"Chat error: {str(e)}")
+                    error_msg = "I'm experiencing technical difficulties. Please try again."
+                    st.error(error_msg)
+                    st.session_state.chat_messages.append({"role": "assistant", "content": error_msg})
 
 
 def symptom_checker_page():
@@ -195,23 +230,18 @@ def symptom_checker_page():
             st.warning("Please describe your symptoms first.")
         else:
             with st.spinner("Analyzing symptoms..."):
-                if gemini:
-                    analysis = gemini.analyze_symptoms(symptoms)
+                try:
+                    session = db_manager.get_session()
+                    chat_service = ChatService(session)
+                    result = chat_service.analyze_symptoms(st.session_state.user['id'], symptoms)
                     
                     st.markdown("### Analysis Results")
-                    st.markdown(analysis)
+                    st.markdown(result['analysis'])
                     
-                    # Save to chat history
-                    try:
-                        db.add_chat_message(
-                            st.session_state.user['id'],
-                            f"Symptom Check: {symptoms}",
-                            analysis
-                        )
-                    except Exception as e:
-                        st.error(f"Failed to save analysis: {str(e)}")
-                else:
-                    st.error("AI assistant is currently unavailable.")
+                    session.close()
+                except Exception as e:
+                    logger.error(f"Symptom analysis error: {str(e)}")
+                    st.error("Failed to analyze symptoms. Please try again.")
     
     st.markdown("---")
     st.warning("⚠️ **Important:** This is not a medical diagnosis. Please consult a healthcare professional for proper evaluation and treatment.")
@@ -242,17 +272,28 @@ def treatment_plan_page():
                 st.warning("Please enter a condition or health concern.")
             else:
                 with st.spinner("Generating personalized treatment plan..."):
-                    if gemini:
+                    try:
+                        session = db_manager.get_session()
+                        chat_service = ChatService(session)
+                        
                         patient_info = {
                             'age': st.session_state.user['age'],
                             'gender': st.session_state.user['gender']
                         }
                         
-                        plan = gemini.generate_treatment_plan(condition, patient_info)
+                        plan = chat_service.generate_treatment_plan(
+                            st.session_state.user['id'],
+                            condition,
+                            patient_info
+                        )
+                        
                         st.session_state.generated_plan = plan
                         st.session_state.plan_condition = condition
-                    else:
-                        st.error("AI assistant is currently unavailable.")
+                        
+                        session.close()
+                    except Exception as e:
+                        logger.error(f"Treatment plan generation error: {str(e)}")
+                        st.error("Failed to generate treatment plan. Please try again.")
         
         # Display generated plan if available
         if st.session_state.generated_plan:
@@ -266,7 +307,9 @@ def treatment_plan_page():
             with col1:
                 if st.button("Save Plan"):
                     try:
-                        db.create_treatment_plan(
+                        session = db_manager.get_session()
+                        treatment_service = TreatmentService(session)
+                        treatment_service.create_plan(
                             user_id=st.session_state.user['id'],
                             title=plan_title,
                             condition=st.session_state.plan_condition,
@@ -275,8 +318,10 @@ def treatment_plan_page():
                         st.success("Treatment plan saved successfully!")
                         st.session_state.generated_plan = None
                         st.session_state.plan_condition = None
+                        session.close()
                     except Exception as e:
-                        st.error(f"Failed to save plan: {str(e)}")
+                        logger.error(f"Error saving plan: {str(e)}")
+                        st.error("Failed to save plan. Please try again.")
             with col2:
                 if st.button("Clear"):
                     st.session_state.generated_plan = None
@@ -286,17 +331,24 @@ def treatment_plan_page():
     with tab2:
         st.subheader("Your Saved Treatment Plans")
         
-        plans = db.get_treatment_plans(st.session_state.user['id'])
-        
-        if not plans:
-            st.info("You don't have any saved treatment plans yet.")
-        else:
-            for plan in plans:
-                with st.expander(f"📄 {plan.title} - {plan.created_at.strftime('%Y-%m-%d')}"):
-                    st.markdown(f"**Condition:** {plan.condition}")
-                    st.markdown(f"**Created:** {plan.created_at.strftime('%Y-%m-%d %H:%M')}")
-                    st.markdown("---")
-                    st.markdown(plan.plan_details)
+        try:
+            session = db_manager.get_session()
+            treatment_service = TreatmentService(session)
+            plans = treatment_service.get_user_plans(st.session_state.user['id'])
+            session.close()
+            
+            if not plans:
+                st.info("You don't have any saved treatment plans yet.")
+            else:
+                for plan in plans:
+                    with st.expander(f"📄 {plan['title']} - {plan['created_at'].strftime('%Y-%m-%d')}"):
+                        st.markdown(f"**Condition:** {plan['condition']}")
+                        st.markdown(f"**Created:** {plan['created_at'].strftime('%Y-%m-%d %H:%M')}")
+                        st.markdown("---")
+                        st.markdown(plan['plan_details'])
+        except Exception as e:
+            logger.error(f"Error loading treatment plans: {str(e)}")
+            st.error("Failed to load treatment plans.")
 
 
 def health_analytics_page():
@@ -339,16 +391,22 @@ def health_analytics_page():
                 st.warning("Please enter a valid value.")
             else:
                 try:
-                    db.add_health_metric(
+                    session = db_manager.get_session()
+                    health_service = HealthService(session)
+                    health_service.record_metric(
                         user_id=st.session_state.user['id'],
                         metric_type=metric_type,
                         value=value,
                         unit=unit,
-                        notes=notes
+                        notes=notes if notes else None
                     )
                     st.success(f"Successfully recorded {metric_type}: {value} {unit}")
+                    session.close()
+                except ValidationError as e:
+                    st.error(str(e))
                 except Exception as e:
-                    st.error(f"Failed to record metric: {str(e)}")
+                    logger.error(f"Error recording metric: {str(e)}")
+                    st.error("Failed to record metric. Please try again.")
     
     with tab2:
         st.subheader("Your Health Trends")
@@ -359,61 +417,72 @@ def health_analytics_page():
         
         selected_metric = st.selectbox("Select Metric to Visualize", available_metrics)
         
-        metrics = db.get_health_metrics(st.session_state.user['id'], metric_type=selected_metric)
-        
-        if not metrics:
-            st.info(f"No data recorded for {selected_metric} yet. Start tracking by adding metrics above!")
-        else:
-            # Prepare data for visualization
-            df = pd.DataFrame([
-                {
-                    'Date': m.recorded_at,
-                    'Value': m.value,
-                    'Notes': str(m.notes) if m.notes else ''
-                }
-                for m in reversed(metrics)
-            ])
+        try:
+            session = db_manager.get_session()
+            health_service = HealthService(session)
+            metrics = health_service.get_metrics(st.session_state.user['id'], selected_metric)
+            session.close()
             
-            # Create interactive plot
-            fig = go.Figure()
-            
-            fig.add_trace(go.Scatter(
-                x=df['Date'],
-                y=df['Value'],
-                mode='lines+markers',
-                name=selected_metric,
-                line=dict(color='#1f77b4', width=2),
-                marker=dict(size=8),
-                hovertemplate='<b>%{x}</b><br>Value: %{y}<extra></extra>'
-            ))
-            
-            fig.update_layout(
-                title=f'{selected_metric} Trend',
-                xaxis_title='Date',
-                yaxis_title=f'{selected_metric} ({metrics[0].unit})',
-                hovermode='x unified',
-                height=400
-            )
-            
-            st.plotly_chart(fig, use_container_width=True)
-            
-            # Show statistics
-            col1, col2, col3, col4 = st.columns(4)
-            
-            with col1:
-                st.metric("Latest", f"{df['Value'].iloc[-1]:.1f} {metrics[0].unit}")
-            with col2:
-                st.metric("Average", f"{df['Value'].mean():.1f} {metrics[0].unit}")
-            with col3:
-                st.metric("Minimum", f"{df['Value'].min():.1f} {metrics[0].unit}")
-            with col4:
-                st.metric("Maximum", f"{df['Value'].max():.1f} {metrics[0].unit}")
-            
-            # Show data table
-            st.markdown("### Recent Measurements")
-            display_df = df.copy()
-            display_df['Date'] = display_df['Date'].dt.strftime('%Y-%m-%d %H:%M')
-            st.dataframe(display_df, use_container_width=True)
+            if not metrics:
+                st.info(f"No data recorded for {selected_metric} yet. Start tracking by adding metrics above!")
+            else:
+                # Prepare data for visualization
+                df = pd.DataFrame([
+                    {
+                        'Date': m['recorded_at'],
+                        'Value': m['value'],
+                        'Notes': m['notes'] if m['notes'] else ''
+                    }
+                    for m in reversed(metrics)
+                ])
+                
+                # Create interactive plot
+                fig = go.Figure()
+                
+                fig.add_trace(go.Scatter(
+                    x=df['Date'],
+                    y=df['Value'],
+                    mode='lines+markers',
+                    name=selected_metric,
+                    line=dict(color='#1f77b4', width=2),
+                    marker=dict(size=8),
+                    hovertemplate='<b>%{x}</b><br>Value: %{y}<extra></extra>'
+                ))
+                
+                fig.update_layout(
+                    title=f'{selected_metric} Trend',
+                    xaxis_title='Date',
+                    yaxis_title=f'{selected_metric} ({metrics[0]["unit"]})',
+                    hovermode='x unified',
+                    height=400
+                )
+                
+                st.plotly_chart(fig, use_container_width=True)
+                
+                # Show statistics
+                stats = health_service.get_statistics(st.session_state.user['id'], selected_metric)
+                
+                if stats:
+                    col1, col2, col3, col4 = st.columns(4)
+                    
+                    with col1:
+                        st.metric("Latest", f"{stats['latest']:.1f} {stats['unit']}")
+                    with col2:
+                        st.metric("Average", f"{stats['average']:.1f} {stats['unit']}")
+                    with col3:
+                        st.metric("Minimum", f"{stats['minimum']:.1f} {stats['unit']}")
+                    with col4:
+                        st.metric("Maximum", f"{stats['maximum']:.1f} {stats['unit']}")
+                
+                # Show data table
+                st.markdown("### Recent Measurements")
+                display_df = df.copy()
+                display_df['Date'] = display_df['Date'].dt.strftime('%Y-%m-%d %H:%M')
+                st.dataframe(display_df, use_container_width=True)
+                
+        except Exception as e:
+            logger.error(f"Error loading health analytics: {str(e)}")
+            st.error("Failed to load health analytics.")
 
 
 def main():
@@ -440,6 +509,7 @@ def main():
             st.session_state.logged_in = False
             st.session_state.user = None
             st.session_state.chat_messages = []
+            logger.info(f"User logged out")
             st.rerun()
         
         # Show medical disclaimer
