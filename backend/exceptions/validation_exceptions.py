@@ -5,11 +5,13 @@ Validation-related exceptions.
 
 class ValidationError(Exception):
     """Base exception for validation errors"""
+
     pass
 
 
 class InvalidInputError(ValidationError):
     """Raised when input fails validation"""
+
     def __init__(self, field: str, message: str):
         self.field = field
         self.message = f"Invalid {field}: {message}"
@@ -18,6 +20,7 @@ class InvalidInputError(ValidationError):
 
 class InputTooLongError(ValidationError):
     """Raised when input exceeds maximum length"""
+
     def __init__(self, field: str, max_length: int, actual_length: int):
         self.field = field
         self.max_length = max_length
@@ -28,6 +31,7 @@ class InputTooLongError(ValidationError):
 
 class InputTooShortError(ValidationError):
     """Raised when input is below minimum length"""
+
     def __init__(self, field: str, min_length: int, actual_length: int):
         self.field = field
         self.min_length = min_length
@@ -38,6 +42,7 @@ class InputTooShortError(ValidationError):
 
 class InvalidFormatError(ValidationError):
     """Raised when input format is invalid"""
+
     def __init__(self, field: str, expected_format: str):
         self.field = field
         self.expected_format = expected_format
@@ -47,6 +52,7 @@ class InvalidFormatError(ValidationError):
 
 class ValueOutOfRangeError(ValidationError):
     """Raised when numeric value is out of acceptable range"""
+
     def __init__(self, field: str, min_val: float, max_val: float, actual_val: float):
         self.field = field
         self.min_val = min_val

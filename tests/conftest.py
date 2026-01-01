@@ -1,6 +1,7 @@
 """
 Pytest configuration and fixtures.
 """
+
 import pytest
 import sys
 import os
@@ -18,14 +19,14 @@ from backend.utils.database import DatabaseManager
 def test_db():
     """Create a test database for each test"""
     # Use in-memory SQLite for tests
-    engine = create_engine('sqlite:///:memory:')
+    engine = create_engine("sqlite:///:memory:")
     Base.metadata.create_all(engine)
-    
+
     SessionLocal = sessionmaker(bind=engine)
     session = SessionLocal()
-    
+
     yield session
-    
+
     session.close()
     Base.metadata.drop_all(engine)
 
@@ -34,11 +35,11 @@ def test_db():
 def sample_user_data():
     """Sample user data for testing"""
     return {
-        'username': 'testuser',
-        'password': 'testpass123',
-        'full_name': 'Test User',
-        'age': 30,
-        'gender': 'Male'
+        "username": "testuser",
+        "password": "testpass123",
+        "full_name": "Test User",
+        "age": 30,
+        "gender": "Male",
     }
 
 
@@ -46,8 +47,8 @@ def sample_user_data():
 def sample_chat_data():
     """Sample chat data for testing"""
     return {
-        'message': 'I have a headache',
-        'response': 'I understand you have a headache. This could be due to various reasons...'
+        "message": "I have a headache",
+        "response": "I understand you have a headache. This could be due to various reasons...",
     }
 
 
@@ -55,10 +56,10 @@ def sample_chat_data():
 def sample_health_metric():
     """Sample health metric for testing"""
     return {
-        'metric_type': 'Heart Rate',
-        'value': 75.0,
-        'unit': 'bpm',
-        'notes': 'Resting heart rate'
+        "metric_type": "Heart Rate",
+        "value": 75.0,
+        "unit": "bpm",
+        "notes": "Resting heart rate",
     }
 
 
@@ -66,7 +67,7 @@ def sample_health_metric():
 def sample_treatment_plan():
     """Sample treatment plan for testing"""
     return {
-        'title': 'Diabetes Management Plan',
-        'condition': 'Type 2 Diabetes',
-        'plan_details': 'Comprehensive plan for managing Type 2 Diabetes...'
+        "title": "Diabetes Management Plan",
+        "condition": "Type 2 Diabetes",
+        "plan_details": "Comprehensive plan for managing Type 2 Diabetes...",
     }
