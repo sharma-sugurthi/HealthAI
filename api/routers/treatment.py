@@ -2,12 +2,13 @@
 Treatment plans router.
 """
 
-from fastapi import APIRouter, Depends, HTTPException, status
-from sqlalchemy.orm import Session
 from typing import List
 
+from fastapi import APIRouter, Depends, HTTPException, status
+from sqlalchemy.orm import Session
+
+from api.dependencies import get_current_user, get_db
 from api.schemas.treatment import TreatmentPlanCreate, TreatmentPlanResponse
-from api.dependencies import get_db, get_current_user
 from backend.services.treatment_service import TreatmentService
 from backend.utils.logger import get_logger
 

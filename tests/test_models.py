@@ -3,10 +3,11 @@ Tests for database models.
 """
 
 import pytest
-from backend.models.user import User
+
 from backend.models.chat import ChatHistory
-from backend.models.treatment import TreatmentPlan
 from backend.models.health_metric import HealthMetric
+from backend.models.treatment import TreatmentPlan
+from backend.models.user import User
 
 
 class TestUserModel:

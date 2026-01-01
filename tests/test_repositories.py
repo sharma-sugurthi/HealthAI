@@ -3,10 +3,11 @@ Tests for repositories.
 """
 
 import pytest
-from backend.repositories.user_repository import UserRepository
+
+from backend.models.user import User
 from backend.repositories.chat_repository import ChatRepository
 from backend.repositories.health_repository import HealthRepository
-from backend.models.user import User
+from backend.repositories.user_repository import UserRepository
 
 
 class TestUserRepository:

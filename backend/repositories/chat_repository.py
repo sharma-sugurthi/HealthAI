@@ -3,8 +3,10 @@ Chat repository for chat history operations.
 """
 
 from typing import List
-from sqlalchemy.orm import Session
+
 from sqlalchemy import desc
+from sqlalchemy.orm import Session
+
 from backend.models.chat import ChatHistory
 from backend.repositories.base import BaseRepository
 from backend.utils.logger import get_logger

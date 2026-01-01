@@ -3,8 +3,10 @@ Treatment repository for treatment plan operations.
 """
 
 from typing import List
-from sqlalchemy.orm import Session
+
 from sqlalchemy import desc
+from sqlalchemy.orm import Session
+
 from backend.models.treatment import TreatmentPlan
 from backend.repositories.base import BaseRepository
 from backend.utils.logger import get_logger

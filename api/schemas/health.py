@@ -2,9 +2,10 @@
 Pydantic schemas for health metrics.
 """
 
-from pydantic import BaseModel, Field
-from typing import Optional
 from datetime import datetime
+from typing import Optional
+
+from pydantic import BaseModel, Field
 
 
 class HealthMetricCreate(BaseModel):

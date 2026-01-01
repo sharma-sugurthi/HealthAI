@@ -3,8 +3,10 @@ Health repository for health metric operations.
 """
 
 from typing import List, Optional
-from sqlalchemy.orm import Session
+
 from sqlalchemy import desc
+from sqlalchemy.orm import Session
+
 from backend.models.health_metric import HealthMetric
 from backend.repositories.base import BaseRepository
 from backend.utils.logger import get_logger

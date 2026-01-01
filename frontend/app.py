@@ -3,24 +3,25 @@ HealthAI Frontend - Streamlit Application
 Uses service layer for all business logic and data access.
 """
 
-import streamlit as st
+import os
+import sys
+from datetime import datetime
+
 import pandas as pd
 import plotly.graph_objects as go
-from datetime import datetime
-import sys
-import os
+import streamlit as st
 
 # Add parent directory to path for imports
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
+from backend.exceptions.auth_exceptions import InvalidCredentialsError, UserAlreadyExistsError
+from backend.exceptions.validation_exceptions import ValidationError
 from backend.services.auth_service import AuthService
 from backend.services.chat_service import ChatService
 from backend.services.health_service import HealthService
 from backend.services.treatment_service import TreatmentService
 from backend.utils.database import get_db_manager
 from backend.utils.logger import get_logger
-from backend.exceptions.auth_exceptions import InvalidCredentialsError, UserAlreadyExistsError
-from backend.exceptions.validation_exceptions import ValidationError
 from config import config
 
 # Initialize logger

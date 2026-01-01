@@ -2,8 +2,10 @@
 Health service for managing health metrics.
 """
 
-from typing import List, Dict, Optional
+from typing import Dict, List, Optional
+
 from sqlalchemy.orm import Session
+
 from backend.repositories.health_repository import HealthRepository
 from backend.utils.logger import get_logger
 from validation import InputValidator

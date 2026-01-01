@@ -3,13 +3,15 @@ Authentication service for user registration and login.
 """
 
 from typing import Dict, Optional
+
 from sqlalchemy.orm import Session
-from backend.repositories.user_repository import UserRepository
+
 from backend.exceptions.auth_exceptions import (
     InvalidCredentialsError,
     UserAlreadyExistsError,
     UserNotFoundError,
 )
+from backend.repositories.user_repository import UserRepository
 from backend.utils.logger import get_logger
 from validation import InputValidator
 

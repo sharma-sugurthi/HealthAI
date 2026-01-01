@@ -2,17 +2,18 @@
 Authentication router for user registration and login.
 """
 
-from fastapi import APIRouter, Depends, HTTPException, status
-from sqlalchemy.orm import Session
 from datetime import timedelta
 
-from api.schemas.user import UserCreate, UserLogin, UserResponse, TokenResponse
-from api.dependencies import get_db, get_current_user
+from fastapi import APIRouter, Depends, HTTPException, status
+from sqlalchemy.orm import Session
+
+from api.dependencies import get_current_user, get_db
+from api.schemas.user import TokenResponse, UserCreate, UserLogin, UserResponse
+from backend.exceptions.auth_exceptions import InvalidCredentialsError, UserAlreadyExistsError
+from backend.exceptions.validation_exceptions import ValidationError
 from backend.services.auth_service import AuthService
 from backend.utils.jwt import create_access_token, create_refresh_token
 from backend.utils.logger import get_logger
-from backend.exceptions.auth_exceptions import InvalidCredentialsError, UserAlreadyExistsError
-from backend.exceptions.validation_exceptions import ValidationError
 
 logger = get_logger(__name__)
 router = APIRouter()

@@ -3,9 +3,11 @@ Dependency injection for FastAPI.
 """
 
 from typing import Generator
+
 from fastapi import Depends, HTTPException, status
-from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
+from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 from sqlalchemy.orm import Session
+
 from backend.utils.database import get_db_manager
 from backend.utils.jwt import verify_token
 from backend.utils.logger import get_logger

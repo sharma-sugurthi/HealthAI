@@ -1,7 +1,7 @@
 # Models package
-from .user import User
 from .chat import ChatHistory
-from .treatment import TreatmentPlan
 from .health_metric import HealthMetric
+from .treatment import TreatmentPlan
+from .user import User
 
 __all__ = ["User", "ChatHistory", "TreatmentPlan", "HealthMetric"]

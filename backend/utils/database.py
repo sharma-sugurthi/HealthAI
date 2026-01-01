@@ -2,13 +2,15 @@
 Database utility for managing database connections and sessions.
 """
 
-from typing import Generator
 from contextlib import contextmanager
+from typing import Generator
+
 from sqlalchemy import create_engine
-from sqlalchemy.orm import sessionmaker, Session
+from sqlalchemy.orm import Session, sessionmaker
 from sqlalchemy.pool import StaticPool
-from config import config
+
 from backend.models.user import Base
+from config import config
 
 
 class DatabaseManager:

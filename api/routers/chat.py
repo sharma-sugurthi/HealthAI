@@ -2,19 +2,20 @@
 Chat router for AI conversations.
 """
 
-from fastapi import APIRouter, Depends, HTTPException, status
-from sqlalchemy.orm import Session
 from typing import List
 
+from fastapi import APIRouter, Depends, HTTPException, status
+from sqlalchemy.orm import Session
+
+from api.dependencies import get_current_user, get_db
 from api.schemas.chat import (
     ChatMessageCreate,
     ChatMessageResponse,
     SymptomAnalysisRequest,
     SymptomAnalysisResponse,
-    TreatmentPlanRequest,
     TreatmentPlanGenerationResponse,
+    TreatmentPlanRequest,
 )
-from api.dependencies import get_db, get_current_user
 from backend.services.chat_service import ChatService
 from backend.utils.logger import get_logger
 

@@ -1,12 +1,14 @@
-import streamlit as st
-import pandas as pd
-import plotly.graph_objects as go
-import plotly.express as px
-from datetime import datetime, timedelta
-from db import DatabaseManager, User
-from ai_client import get_ai_client
 import os
+from datetime import datetime, timedelta
+
+import pandas as pd
+import plotly.express as px
+import plotly.graph_objects as go
+import streamlit as st
 from dotenv import load_dotenv
+
+from ai_client import get_ai_client
+from db import DatabaseManager, User
 
 # Load environment variables from .env file
 load_dotenv()

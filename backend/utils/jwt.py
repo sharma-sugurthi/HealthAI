@@ -3,10 +3,12 @@ JWT utility functions for token generation and validation.
 """
 
 from datetime import datetime, timedelta
-from typing import Optional, Dict
+from typing import Dict, Optional
+
 from jose import JWTError, jwt
-from config import config
+
 from backend.utils.logger import get_logger
+from config import config
 
 logger = get_logger(__name__)
 

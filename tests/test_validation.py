@@ -3,6 +3,7 @@ Tests for validation module.
 """
 
 import pytest
+
 from validation import InputValidator, ValidationError
 
 

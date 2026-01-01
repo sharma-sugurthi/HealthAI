@@ -3,10 +3,11 @@ User model for authentication and user management.
 """
 
 from datetime import datetime
-from sqlalchemy import Column, Integer, String, DateTime
+
+import bcrypt
+from sqlalchemy import Column, DateTime, Integer, String
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import relationship
-import bcrypt
 
 Base = declarative_base()
 

@@ -2,8 +2,10 @@
 Treatment service for managing treatment plans.
 """
 
-from typing import List, Dict, Optional
+from typing import Dict, List, Optional
+
 from sqlalchemy.orm import Session
+
 from backend.repositories.treatment_repository import TreatmentRepository
 from backend.utils.logger import get_logger
 from validation import InputValidator

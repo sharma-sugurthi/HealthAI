@@ -1,8 +1,10 @@
+import logging
 import os
 import time
-import logging
 from typing import Optional
+
 from openai import OpenAI
+
 from config import config
 
 # Using OpenRouter API for AI-powered healthcare assistance
