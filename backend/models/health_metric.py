@@ -31,4 +31,7 @@ class HealthMetric(Base):
     )
 
     def __repr__(self) -> str:
-        return f"<HealthMetric(id={self.id}, type='{self.metric_type}', value={self.value} {self.unit})>"
+        return (
+            f"<HealthMetric(id={self.id}, type='{self.metric_type}', "
+            f"value={self.value} {self.unit})>"
+        )
