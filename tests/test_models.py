@@ -57,6 +57,7 @@ class TestUserModel:
             age=sample_user_data["age"],
             gender=sample_user_data["gender"],
         )
+        user.set_password(sample_user_data["password"])
         test_db.add(user)
         test_db.commit()
 
@@ -77,6 +78,7 @@ class TestChatHistoryModel:
             age=sample_user_data["age"],
             gender=sample_user_data["gender"],
         )
+        user.set_password(sample_user_data["password"])
         test_db.add(user)
         test_db.commit()
 
@@ -107,6 +109,7 @@ class TestTreatmentPlanModel:
             age=sample_user_data["age"],
             gender=sample_user_data["gender"],
         )
+        user.set_password(sample_user_data["password"])
         test_db.add(user)
         test_db.commit()
 
@@ -137,6 +140,7 @@ class TestHealthMetricModel:
             age=sample_user_data["age"],
             gender=sample_user_data["gender"],
         )
+        user.set_password(sample_user_data["password"])
         test_db.add(user)
         test_db.commit()
 
