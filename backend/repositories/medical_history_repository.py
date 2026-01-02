@@ -20,6 +20,7 @@ class MedicalHistoryRepository(BaseRepository[MedicalCondition]):
 
     def __init__(self, db: Session):
         super().__init__(MedicalCondition, db)
+        self.session = db
 
     def get_by_user(self, user_id: int, status: Optional[str] = None) -> List[MedicalCondition]:
         """
