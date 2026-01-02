@@ -20,6 +20,7 @@ class AllergyRepository(BaseRepository[Allergy]):
 
     def __init__(self, db: Session):
         super().__init__(Allergy, db)
+        self.session = db
 
     def get_by_user(self, user_id: int) -> List[Allergy]:
         """Get all allergies for a user"""

@@ -20,6 +20,7 @@ class SymptomRepository(BaseRepository[SymptomLog]):
 
     def __init__(self, db: Session):
         super().__init__(SymptomLog, db)
+        self.session = db
 
     def get_by_user(self, user_id: int, limit: Optional[int] = None) -> List[SymptomLog]:
         """Get symptom logs for a user"""

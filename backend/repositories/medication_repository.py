@@ -20,6 +20,7 @@ class MedicationRepository(BaseRepository[Medication]):
 
     def __init__(self, db: Session):
         super().__init__(Medication, db)
+        self.session = db
 
     def get_by_user(self, user_id: int, status: Optional[str] = None) -> List[Medication]:
         """Get all medications for a user"""
