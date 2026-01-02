@@ -34,6 +34,14 @@ class User(Base):
         "HealthMetric", back_populates="user", cascade="all, delete-orphan"
     )
 
+    # Medical history relationships (Tier 3)
+    medical_conditions = relationship(
+        "MedicalCondition", back_populates="user", cascade="all, delete-orphan"
+    )
+    medications = relationship("Medication", back_populates="user", cascade="all, delete-orphan")
+    allergies = relationship("Allergy", back_populates="user", cascade="all, delete-orphan")
+    symptom_logs = relationship("SymptomLog", back_populates="user", cascade="all, delete-orphan")
+
     def set_password(self, password: str) -> None:
         """Hash and set password"""
         salt = bcrypt.gensalt()

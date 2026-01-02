@@ -10,7 +10,7 @@ from slowapi import Limiter, _rate_limit_exceeded_handler
 from slowapi.errors import RateLimitExceeded
 from slowapi.util import get_remote_address
 
-from api.routers import auth, chat, health, treatment
+from api.routers import auth, chat, enhanced_chat, health, medical_history, treatment
 from backend.utils.logger import get_logger
 from config import config
 
@@ -22,8 +22,8 @@ limiter = Limiter(key_func=get_remote_address)
 # Create FastAPI app
 app = FastAPI(
     title="HealthAI API",
-    description="Intelligent Healthcare Assistant API powered by AI",
-    version="1.0.0",
+    description="Intelligent Healthcare Assistant API with Advanced Medical AI (Tier 3)",
+    version="2.0.0",
     docs_url="/docs",
     redoc_url="/redoc",
 )
@@ -49,6 +49,10 @@ app.include_router(health.router, prefix=f"{config.API_PREFIX}/health", tags=["H
 app.include_router(
     treatment.router, prefix=f"{config.API_PREFIX}/treatment", tags=["Treatment Plans"]
 )
+
+# Tier 3: Advanced Medical AI
+app.include_router(enhanced_chat.router, prefix=config.API_PREFIX)
+app.include_router(medical_history.router, prefix=config.API_PREFIX)
 
 
 @app.get("/", tags=["Root"])
