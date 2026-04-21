@@ -16,7 +16,6 @@ class ValidationError(Exception):
 class InputValidator:
     """Validates and sanitizes user inputs"""
 
-    # Maximum lengths for various inputs
     MAX_USERNAME_LENGTH = 50
     MAX_PASSWORD_LENGTH = 128
     MAX_NAME_LENGTH = 100
@@ -25,7 +24,6 @@ class InputValidator:
     MAX_CONDITION_LENGTH = 200
     MAX_NOTES_LENGTH = 1000
 
-    # Minimum lengths
     MIN_USERNAME_LENGTH = 3
     MIN_PASSWORD_LENGTH = 6
     MIN_NAME_LENGTH = 2
@@ -39,14 +37,11 @@ class InputValidator:
         if not isinstance(text, str):
             raise ValidationError("Input must be a string")
 
-        # Strip whitespace
         text = text.strip()
 
-        # Enforce max length
         if len(text) > max_length:
             raise ValidationError(f"Input exceeds maximum length of {max_length} characters")
 
-        # Remove null bytes and other control characters
         text = re.sub(r"[\x00-\x08\x0b\x0c\x0e-\x1f\x7f]", "", text)
 
         return text
@@ -59,7 +54,6 @@ class InputValidator:
         if len(username) < cls.MIN_USERNAME_LENGTH:
             raise ValidationError(f"Username must be at least {cls.MIN_USERNAME_LENGTH} characters")
 
-        # Only allow alphanumeric, underscore, and hyphen
         if not re.match(r"^[a-zA-Z0-9_-]+$", username):
             raise ValidationError(
                 "Username can only contain letters, numbers, underscores, and hyphens"
@@ -91,7 +85,6 @@ class InputValidator:
         if len(name) < cls.MIN_NAME_LENGTH:
             raise ValidationError(f"Name must be at least {cls.MIN_NAME_LENGTH} characters")
 
-        # Allow letters, spaces, hyphens, and apostrophes
         if not re.match(r"^[a-zA-Z\s'-]+$", name):
             raise ValidationError("Name can only contain letters, spaces, hyphens, and apostrophes")
 
@@ -152,7 +145,6 @@ class InputValidator:
         if not isinstance(value, (int, float)):
             raise ValidationError("Metric value must be a number")
 
-        # Define reasonable ranges for different metrics
         ranges = {
             "Heart Rate": (20, 300),
             "Blood Pressure (Systolic)": (50, 300),

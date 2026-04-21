@@ -11,7 +11,7 @@ from api.dependencies import get_current_user, get_db
 from api.schemas.health import HealthMetricCreate, HealthMetricResponse, HealthStatisticsResponse
 from backend.services.health_service import HealthService
 from backend.utils.logger import get_logger
-from validation import ValidationError
+from backend.utils.validation import ValidationError
 
 logger = get_logger(__name__)
 router = APIRouter()

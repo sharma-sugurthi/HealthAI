@@ -1,5 +1,4 @@
 import logging
-import os
 import time
 from typing import Optional
 
@@ -47,7 +46,6 @@ class HealthAIClient:
     ) -> str:
         """Make a request to OpenRouter API with retry logic"""
 
-        # Build messages array for OpenAI-compatible format
         messages = []
         if system_instruction:
             messages.append({"role": "system", "content": system_instruction})
@@ -62,15 +60,15 @@ class HealthAIClient:
                     max_tokens=max_tokens if max_tokens is not None else config.AI_MAX_TOKENS,
                 )
 
-                # Extract response content
                 if response.choices and len(response.choices) > 0:
                     content = response.choices[0].message.content
                     if content:
                         return content
-                    else:
-                        return "I apologize, but I couldn't generate a response. Please try again or rephrase your question."
-                else:
-                    return "I apologize, but I couldn't generate a response. Please try again."
+                    return (
+                        "I apologize, but I couldn't generate a response. "
+                        "Please try again or rephrase your question."
+                    )
+                return "I apologize, but I couldn't generate a response. Please try again."
 
             except Exception as e:
                 logger.error(f"Attempt {attempt + 1} failed: {str(e)}")
@@ -101,34 +99,39 @@ class HealthAIClient:
     def chat_with_patient(self, message: str) -> str:
         """Handle patient chat queries"""
 
-        system_instruction = """You are HealthAI, an intelligent healthcare assistant. Your role is to:
-1. Provide accurate, evidence-based health information
-2. Be empathetic and supportive
-3. Always remind users that you are an AI assistant and not a substitute for professional medical advice
-4. Encourage users to consult healthcare professionals for serious concerns
-5. Be clear and concise in your responses
-6. Ask clarifying questions when needed
-
-Important: Always include a disclaimer that you are not a doctor and users should seek professional medical advice for diagnosis and treatment."""
+        system_instruction = (
+            "You are HealthAI, an intelligent healthcare assistant. Your role is to:\n"
+            "1. Provide accurate, evidence-based health information\n"
+            "2. Be empathetic and supportive\n"
+            "3. Always remind users that you are an AI assistant and not a substitute "
+            "for professional medical advice\n"
+            "4. Encourage users to consult healthcare professionals for serious concerns\n"
+            "5. Be clear and concise in your responses\n"
+            "6. Ask clarifying questions when needed\n\n"
+            "Important: Always include a disclaimer that you are not a doctor and users "
+            "should seek professional medical advice for diagnosis and treatment."
+        )
 
         return self._make_request(message, system_instruction)
 
     def analyze_symptoms(self, symptoms: str) -> str:
         """Analyze symptoms and suggest possible conditions"""
 
-        system_instruction = """You are a medical symptom analyzer. Based on the symptoms provided:
-1. List possible conditions that could cause these symptoms (from most to least likely)
-2. Explain why each condition might be relevant
-3. Suggest when to seek immediate medical attention
-4. Recommend appropriate next steps
-
-IMPORTANT: Always emphasize that this is not a diagnosis and users must consult a healthcare professional for proper evaluation.
-
-Format your response clearly with:
-- Possible Conditions (with likelihood)
-- When to Seek Immediate Care
-- Recommended Next Steps
-- Disclaimer"""
+        system_instruction = (
+            "You are a medical symptom analyzer. Based on the symptoms provided:\n"
+            "1. List possible conditions that could cause these symptoms "
+            "(from most to least likely)\n"
+            "2. Explain why each condition might be relevant\n"
+            "3. Suggest when to seek immediate medical attention\n"
+            "4. Recommend appropriate next steps\n\n"
+            "IMPORTANT: Always emphasize that this is not a diagnosis and users must "
+            "consult a healthcare professional for proper evaluation.\n\n"
+            "Format your response clearly with:\n"
+            "- Possible Conditions (with likelihood)\n"
+            "- When to Seek Immediate Care\n"
+            "- Recommended Next Steps\n"
+            "- Disclaimer"
+        )
 
         prompt = f"Please analyze these symptoms and provide possible conditions:\n\n{symptoms}"
         return self._make_request(prompt, system_instruction)
@@ -136,34 +139,43 @@ Format your response clearly with:
     def generate_treatment_plan(self, condition: str, patient_info: dict) -> str:
         """Generate a treatment plan recommendation"""
 
-        system_instruction = """You are a healthcare planning assistant. Generate a comprehensive treatment plan that includes:
-1. Overview of the condition
-2. Recommended lifestyle modifications
-3. Dietary recommendations
-4. Exercise suggestions
-5. When to follow up with healthcare providers
-6. Warning signs to watch for
-
-IMPORTANT: This is a general wellness plan, not a medical prescription. Always remind users to consult their healthcare provider before starting any treatment."""
+        system_instruction = (
+            "You are a healthcare planning assistant. Generate a comprehensive "
+            "treatment plan that includes:\n"
+            "1. Overview of the condition\n"
+            "2. Recommended lifestyle modifications\n"
+            "3. Dietary recommendations\n"
+            "4. Exercise suggestions\n"
+            "5. When to follow up with healthcare providers\n"
+            "6. Warning signs to watch for\n\n"
+            "IMPORTANT: This is a general wellness plan, not a medical prescription. "
+            "Always remind users to consult their healthcare provider before starting "
+            "any treatment."
+        )
 
         patient_context = (
             f"Patient: {patient_info.get('age')} years old, {patient_info.get('gender')}"
         )
-        prompt = f"{patient_context}\n\nCondition: {condition}\n\nPlease generate a comprehensive treatment and wellness plan."
+        prompt = (
+            f"{patient_context}\n\nCondition: {condition}\n\n"
+            "Please generate a comprehensive treatment and wellness plan."
+        )
 
         return self._make_request(prompt, system_instruction)
 
     def get_health_advice(self, topic: str) -> str:
         """Get general health advice on a topic"""
 
-        system_instruction = """You are a health educator. Provide clear, evidence-based information about health topics.
-Include:
-1. Key facts about the topic
-2. Best practices
-3. Common misconceptions
-4. When to consult a healthcare provider
-
-Keep responses informative but accessible to general audiences."""
+        system_instruction = (
+            "You are a health educator. Provide clear, evidence-based information "
+            "about health topics.\n"
+            "Include:\n"
+            "1. Key facts about the topic\n"
+            "2. Best practices\n"
+            "3. Common misconceptions\n"
+            "4. When to consult a healthcare provider\n\n"
+            "Keep responses informative but accessible to general audiences."
+        )
 
         prompt = f"Please provide information and advice about: {topic}"
         return self._make_request(prompt, system_instruction)

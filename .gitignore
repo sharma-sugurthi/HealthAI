@@ -81,14 +81,10 @@ coverage.xml
 .cache/
 .config/
 
-# Streamlit
-.streamlit/secrets.toml
-.streamlit/credentials.toml
-
 # React frontend artifacts
-frontend-react/node_modules/
-frontend-react/dist/
-frontend-react/.vite/
+frontend/node_modules/
+frontend/dist/
+frontend/.vite/
 
 # Documentation builds
 docs/_build/

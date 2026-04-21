@@ -13,7 +13,7 @@ from backend.exceptions.auth_exceptions import InvalidCredentialsError, UserAlre
 from backend.services.auth_service import AuthService
 from backend.utils.jwt import create_access_token, create_refresh_token
 from backend.utils.logger import get_logger
-from validation import ValidationError
+from backend.utils.validation import ValidationError
 
 logger = get_logger(__name__)
 router = APIRouter()

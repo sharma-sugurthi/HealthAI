@@ -4,7 +4,7 @@ Tests for validation module.
 
 import pytest
 
-from validation import InputValidator, ValidationError
+from backend.utils.validation import InputValidator, ValidationError
 
 
 class TestInputValidator:

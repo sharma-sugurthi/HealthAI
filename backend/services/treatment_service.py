@@ -8,7 +8,7 @@ from sqlalchemy.orm import Session
 
 from backend.repositories.treatment_repository import TreatmentRepository
 from backend.utils.logger import get_logger
-from validation import InputValidator
+from backend.utils.validation import InputValidator
 
 logger = get_logger(__name__)
 

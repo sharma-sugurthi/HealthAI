@@ -6,7 +6,7 @@ from typing import Dict, List, Optional
 
 from sqlalchemy.orm import Session
 
-from ai_client import get_ai_client
+from backend.ai.client import get_ai_client
 from backend.ai.prompt_builder import MedicalPromptBuilder
 from backend.ai.safety_checker import MedicalSafetyChecker, SafetyWarningGenerator
 from backend.repositories.chat_repository import ChatRepository

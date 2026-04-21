@@ -61,7 +61,7 @@ class Config:
 
     # CORS Settings
     ALLOWED_ORIGINS: list = os.getenv(
-        "ALLOWED_ORIGINS", "http://localhost:3000,http://localhost:8501"
+        "ALLOWED_ORIGINS", "http://localhost:3000,http://localhost:5173"
     ).split(",")
 
     # Rate Limiting

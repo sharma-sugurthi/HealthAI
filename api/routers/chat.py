@@ -18,7 +18,7 @@ from api.schemas.chat import (
 )
 from backend.services.chat_service import ChatService
 from backend.utils.logger import get_logger
-from validation import ValidationError
+from backend.utils.validation import ValidationError
 
 logger = get_logger(__name__)
 router = APIRouter()

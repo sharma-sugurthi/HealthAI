@@ -24,10 +24,8 @@ COPY . .
 # Create logs directory
 RUN mkdir -p logs
 
-# Expose ports
-# 8000 for FastAPI
-# 8501 for Streamlit
-EXPOSE 8000 8501
+# Expose API port
+EXPOSE 8000
 
 # Health check
 HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \

@@ -19,4 +19,4 @@ Modern React + Vite frontend for the HealthAI backend API.
 ## Notes
 - The backend API is expected at `http://localhost:8000`.
 - Authentication uses JWT tokens returned by the backend.
-- This frontend is designed to replace the Streamlit UI once validated.
+- This is the primary frontend for HealthAI.

@@ -6,10 +6,10 @@ from typing import Dict, List
 
 from sqlalchemy.orm import Session
 
-from ai_client import get_ai_client
+from backend.ai.client import get_ai_client
 from backend.repositories.chat_repository import ChatRepository
 from backend.utils.logger import get_logger
-from validation import InputValidator
+from backend.utils.validation import InputValidator
 
 logger = get_logger(__name__)
 
