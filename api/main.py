@@ -6,10 +6,10 @@ Main API entry point with all routers and middleware.
 from fastapi import FastAPI, Request, status
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
-from sqlalchemy import text
 from slowapi import Limiter, _rate_limit_exceeded_handler
 from slowapi.errors import RateLimitExceeded
 from slowapi.util import get_remote_address
+from sqlalchemy import text
 
 from api.routers import auth, chat, enhanced_chat, health, medical_history, treatment
 from backend.utils.logger import get_logger

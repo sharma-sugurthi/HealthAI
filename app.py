@@ -63,21 +63,18 @@ if "chat_messages" not in st.session_state:
 def show_medical_disclaimer():
     """Display medical disclaimer"""
     st.sidebar.markdown("---")
-    st.sidebar.warning(
-        """
+    st.sidebar.warning("""
     ⚠️ **Medical Disclaimer**
     
     HealthAI is an AI assistant for informational purposes only. It is NOT a substitute for professional medical advice, diagnosis, or treatment. Always seek the advice of your physician or qualified healthcare provider with any questions you may have regarding a medical condition.
-    """
-    )
+    """)
 
 
 def login_page():
     """Display login/registration page"""
     st.title("🏥 HealthAI - Intelligent Healthcare Assistant")
 
-    st.markdown(
-        """
+    st.markdown("""
     Welcome to HealthAI, your intelligent healthcare companion powered by advanced
     AI technology.
     
@@ -86,8 +83,7 @@ def login_page():
     - 🔍 Symptom Checker
     - 📋 Treatment Plan Generator
     - 📊 Health Analytics Dashboard
-    """
-    )
+    """)
 
     tab1, tab2 = st.tabs(["Login", "Create Account"])
 
