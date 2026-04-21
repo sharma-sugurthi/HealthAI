@@ -11,10 +11,10 @@ import pandas as pd
 import plotly.graph_objects as go
 import streamlit as st
 
-# Add parent directory to path for imports
-sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-
-from backend.exceptions.auth_exceptions import InvalidCredentialsError, UserAlreadyExistsError
+from backend.exceptions.auth_exceptions import (
+    InvalidCredentialsError,
+    UserAlreadyExistsError,
+)
 from backend.services.auth_service import AuthService
 from backend.services.chat_service import ChatService
 from backend.services.health_service import HealthService
@@ -23,6 +23,9 @@ from backend.utils.database import get_db_manager
 from backend.utils.logger import get_logger
 from config import config
 from validation import ValidationError
+
+# Add parent directory to path for imports
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 # Initialize logger
 logger = get_logger(__name__)
@@ -273,7 +276,9 @@ def login_page():
             reg_full_name = st.text_input("Full Name", key="reg_full_name")
             reg_age = st.number_input("Age", min_value=1, max_value=120, value=25, key="reg_age")
             reg_gender = st.selectbox(
-                "Gender", ["Male", "Female", "Other", "Prefer not to say"], key="reg_gender"
+                "Gender",
+                ["Male", "Female", "Other", "Prefer not to say"],
+                key="reg_gender",
             )
 
             if st.button("Create Account", type="primary", use_container_width=True):
@@ -349,7 +354,7 @@ def patient_chat_page():
         with quick_cols[0]:
             if st.button("Headache + Fever", use_container_width=True, key="quick_prompt_1"):
                 st.session_state.chat_draft_prompt = (
-                    "I have had headache and mild fever for the last 2 days. What should I do?"
+                    "I have had headache and mild fever for the last 2 days. " "What should I do?"
                 )
         with quick_cols[1]:
             if st.button("Diet Advice", use_container_width=True, key="quick_prompt_2"):
@@ -396,7 +401,7 @@ def patient_chat_page():
                         session.close()
                     except Exception as e:
                         logger.error(f"Chat error: {str(e)}")
-                        error_msg = "I'm experiencing technical difficulties. Please try again."
+                        error_msg = "I'm experiencing technical difficulties. " "Please try again."
                         st.error(error_msg)
                         st.session_state.chat_messages.append(
                             {"role": "assistant", "content": error_msg}
@@ -406,7 +411,9 @@ def patient_chat_page():
         st.markdown("<div class='tool-card'>", unsafe_allow_html=True)
         st.markdown("<div class='tool-title'>Patient Snapshot</div>", unsafe_allow_html=True)
         st.caption(
-            f"{st.session_state.user['full_name']} • {st.session_state.user['age']} yrs • {st.session_state.user['gender']}"
+            f"{st.session_state.user['full_name']} • "
+            f"{st.session_state.user['age']} yrs • "
+            f"{st.session_state.user['gender']}"
         )
         if st.button("🧹 Clear Chat", use_container_width=True):
             st.session_state.chat_messages = []
@@ -491,13 +498,15 @@ def symptom_checker_page():
     st.markdown("Describe your symptoms and I'll help you understand possible conditions.")
 
     st.info(
-        "💡 **Tip:** Be as detailed as possible. Include when symptoms started, severity, and any other relevant information."
+        "💡 **Tip:** Be as detailed as possible. Include when symptoms started, "
+        "severity, and any other relevant information."
     )
 
     symptoms = st.text_area(
         "Describe your symptoms:",
         height=150,
-        placeholder="Example: I've had a headache for 3 days, mild fever (100°F), and fatigue...",
+        placeholder="Example: I've had a headache for 3 days, "
+        "mild fever (100°F), and fatigue...",
     )
 
     if st.button("Analyze Symptoms", type="primary"):
@@ -520,7 +529,8 @@ def symptom_checker_page():
 
     st.markdown("---")
     st.warning(
-        "⚠️ **Important:** This is not a medical diagnosis. Please consult a healthcare professional for proper evaluation and treatment."
+        "⚠️ **Important:** This is not a medical diagnosis. "
+        "Please consult a healthcare professional for proper evaluation and treatment."
     )
 
 
@@ -580,7 +590,8 @@ def treatment_plan_page():
 
             # Option to save plan
             plan_title = st.text_input(
-                "Save this plan as:", value=f"Treatment Plan for {st.session_state.plan_condition}"
+                "Save this plan as:",
+                value=f"Treatment Plan for {st.session_state.plan_condition}",
             )
 
             col1, col2 = st.columns([1, 4])

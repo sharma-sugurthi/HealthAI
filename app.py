@@ -78,7 +78,8 @@ def login_page():
 
     st.markdown(
         """
-    Welcome to HealthAI, your intelligent healthcare companion powered by advanced AI technology.
+    Welcome to HealthAI, your intelligent healthcare companion powered by advanced
+    AI technology.
     
     **Features:**
     - 💬 AI-Powered Health Chat
@@ -88,12 +89,10 @@ def login_page():
     """
     )
 
-    show_medical_disclaimer()
-
-    tab1, tab2 = st.tabs(["Login", "Register"])
+    tab1, tab2 = st.tabs(["Login", "Create Account"])
 
     with tab1:
-        st.subheader("Login to Your Account")
+        st.subheader("Existing Users Login")
         login_username = st.text_input("Username", key="login_username")
         login_password = st.text_input("Password", type="password", key="login_password")
 
@@ -204,7 +203,8 @@ def symptom_checker_page():
     symptoms = st.text_area(
         "Describe your symptoms:",
         height=150,
-        placeholder="Example: I've had a headache for 3 days, mild fever (100°F), and fatigue...",
+        placeholder="Example: I've had a headache for 3 days, "
+        "mild fever (100°F), and fatigue...",
     )
 
     if st.button("Analyze Symptoms", type="primary"):
@@ -278,7 +278,8 @@ def treatment_plan_page():
 
             # Option to save plan
             plan_title = st.text_input(
-                "Save this plan as:", value=f"Treatment Plan for {st.session_state.plan_condition}"
+                "Save this plan as:",
+                value=f"Treatment Plan for {st.session_state.plan_condition}",
             )
 
             col1, col2 = st.columns([1, 4])
@@ -469,7 +470,12 @@ def main():
         # Navigation menu
         page = st.sidebar.radio(
             "Navigation",
-            ["💬 Patient Chat", "🔍 Symptom Checker", "📋 Treatment Plans", "📊 Health Analytics"],
+            [
+                "💬 Patient Chat",
+                "🔍 Symptom Checker",
+                "📋 Treatment Plans",
+                "📊 Health Analytics",
+            ],
             key="navigation",
         )
 
