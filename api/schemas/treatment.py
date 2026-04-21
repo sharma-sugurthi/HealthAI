@@ -4,7 +4,7 @@ Pydantic schemas for treatment plans.
 
 from datetime import datetime
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, ConfigDict, Field
 
 
 class TreatmentPlanCreate(BaseModel):
@@ -23,6 +23,4 @@ class TreatmentPlanResponse(BaseModel):
     condition: str
     plan_details: str
     created_at: datetime
-
-    class Config:
-        from_attributes = True
+    model_config = ConfigDict(from_attributes=True)

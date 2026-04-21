@@ -27,15 +27,24 @@ class HealthAIClient:
 
         # Initialize OpenAI client with OpenRouter endpoint
         self.client = OpenAI(
-            base_url="https://openrouter.ai/api/v1",
+            base_url=config.OPENROUTER_BASE_URL,
             api_key=self.api_key,
-            default_headers={"HTTP-Referer": "https://healthai.app", "X-Title": config.APP_NAME},
+            default_headers={
+                "HTTP-Referer": config.OPENROUTER_REFERER,
+                "X-Title": config.OPENROUTER_TITLE,
+            },
         )
 
         # Use configured AI model
         self.model_name = config.AI_MODEL
 
-    def _make_request(self, prompt: str, system_instruction: Optional[str] = None) -> str:
+    def _make_request(
+        self,
+        prompt: str,
+        system_instruction: Optional[str] = None,
+        max_tokens: Optional[int] = None,
+        temperature: Optional[float] = None,
+    ) -> str:
         """Make a request to OpenRouter API with retry logic"""
 
         # Build messages array for OpenAI-compatible format
@@ -49,8 +58,8 @@ class HealthAIClient:
                 response = self.client.chat.completions.create(
                     model=self.model_name,
                     messages=messages,
-                    temperature=config.AI_TEMPERATURE,
-                    max_tokens=config.AI_MAX_TOKENS,
+                    temperature=temperature if temperature is not None else config.AI_TEMPERATURE,
+                    max_tokens=max_tokens if max_tokens is not None else config.AI_MAX_TOKENS,
                 )
 
                 # Extract response content
@@ -70,9 +79,24 @@ class HealthAIClient:
                     time.sleep(self.retry_delay * (attempt + 1))
                 else:
                     logger.error(f"All retry attempts failed: {str(e)}")
-                    return f"I'm experiencing technical difficulties. Please try again in a moment. Error: {str(e)}"
+                    return "I'm experiencing technical difficulties. Please try again in a moment."
 
         return "Unable to process your request at this time. Please try again later."
+
+    def chat_completion(
+        self,
+        system_prompt: str,
+        user_message: str,
+        max_tokens: Optional[int] = None,
+        temperature: Optional[float] = None,
+    ) -> str:
+        """Generic chat completion used by enhanced/contextual services."""
+        return self._make_request(
+            prompt=user_message,
+            system_instruction=system_prompt,
+            max_tokens=max_tokens,
+            temperature=temperature,
+        )
 
     def chat_with_patient(self, message: str) -> str:
         """Handle patient chat queries"""

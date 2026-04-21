@@ -48,7 +48,7 @@ async def get_current_user(
         HTTPException: If authentication fails
     """
     token = credentials.credentials
-    payload = verify_token(token)
+    payload = verify_token(token, expected_type="access")
 
     if not payload:
         logger.warning("Invalid token provided")

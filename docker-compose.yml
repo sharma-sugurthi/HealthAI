@@ -31,7 +31,7 @@ services:
     ports:
       - "8000:8000"
     environment:
-      DATABASE_URL: postgresql://healthai:${POSTGRES_PASSWORD:-healthai_password}@postgres:5432/healthai
+      DATABASE_URL: postgresql+psycopg2://healthai:${POSTGRES_PASSWORD:-healthai_password}@postgres:5432/healthai
       OPENROUTER_API_KEY: ${OPENROUTER_API_KEY}
       SECRET_KEY: ${SECRET_KEY:-dev-secret-key-change-in-production}
       ENVIRONMENT: ${ENVIRONMENT:-development}
@@ -56,7 +56,7 @@ services:
     ports:
       - "8501:8501"
     environment:
-      DATABASE_URL: postgresql://healthai:${POSTGRES_PASSWORD:-healthai_password}@postgres:5432/healthai
+      DATABASE_URL: postgresql+psycopg2://healthai:${POSTGRES_PASSWORD:-healthai_password}@postgres:5432/healthai
       OPENROUTER_API_KEY: ${OPENROUTER_API_KEY}
       SECRET_KEY: ${SECRET_KEY:-dev-secret-key-change-in-production}
       ENVIRONMENT: ${ENVIRONMENT:-development}

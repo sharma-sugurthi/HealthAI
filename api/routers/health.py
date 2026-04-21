@@ -11,6 +11,7 @@ from api.dependencies import get_current_user, get_db
 from api.schemas.health import HealthMetricCreate, HealthMetricResponse, HealthStatisticsResponse
 from backend.services.health_service import HealthService
 from backend.utils.logger import get_logger
+from validation import ValidationError
 
 logger = get_logger(__name__)
 router = APIRouter()
@@ -33,6 +34,8 @@ async def record_metric(
             notes=metric_data.notes,
         )
         return HealthMetricResponse(**metric)
+    except ValidationError as e:
+        raise HTTPException(status_code=status.HTTP_422_UNPROCESSABLE_ENTITY, detail=str(e))
     except Exception as e:
         logger.error(f"Error recording metric: {str(e)}")
         raise HTTPException(

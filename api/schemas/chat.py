@@ -5,7 +5,7 @@ Pydantic schemas for chat-related requests and responses.
 from datetime import datetime
 from typing import Optional
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, ConfigDict, Field
 
 
 class ChatMessageCreate(BaseModel):
@@ -21,9 +21,7 @@ class ChatMessageResponse(BaseModel):
     message: str
     response: str
     timestamp: datetime
-
-    class Config:
-        from_attributes = True
+    model_config = ConfigDict(from_attributes=True)
 
 
 class SymptomAnalysisRequest(BaseModel):

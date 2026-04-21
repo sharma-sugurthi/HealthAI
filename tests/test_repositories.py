@@ -5,8 +5,12 @@ Tests for repositories.
 import pytest
 
 from backend.models.user import User
+from backend.repositories.allergy_repository import AllergyRepository
 from backend.repositories.chat_repository import ChatRepository
 from backend.repositories.health_repository import HealthRepository
+from backend.repositories.medical_history_repository import MedicalHistoryRepository
+from backend.repositories.medication_repository import MedicationRepository
+from backend.repositories.symptom_repository import SymptomRepository
 from backend.repositories.user_repository import UserRepository
 
 
@@ -129,3 +133,59 @@ class TestHealthRepository:
         # Get metrics
         metrics = health_repo.get_user_metrics(user.id, "Heart Rate")
         assert len(metrics) == 2
+
+
+class TestMedicalHistoryRepositories:
+    """Regression tests for Tier-3 repositories"""
+
+    def test_add_medical_condition(self, test_db, sample_user_data):
+        """Test adding a medical condition"""
+        user_repo = UserRepository(test_db)
+        user = user_repo.create_user(**sample_user_data)
+
+        repo = MedicalHistoryRepository(test_db)
+        condition = repo.add_condition(user_id=user.id, condition_name="Hypertension")
+
+        assert condition is not None
+        assert condition.id is not None
+        assert condition.user_id == user.id
+
+    def test_add_medication_and_discontinue(self, test_db, sample_user_data):
+        """Test medication lifecycle with user ownership check"""
+        user_repo = UserRepository(test_db)
+        user = user_repo.create_user(**sample_user_data)
+
+        repo = MedicationRepository(test_db)
+        medication = repo.add_medication(user_id=user.id, medication_name="Metformin")
+
+        assert medication is not None
+        assert medication.status == "active"
+
+        updated = repo.discontinue_medication(medication.id, user_id=user.id)
+        assert updated is not None
+        assert updated.status == "discontinued"
+
+    def test_add_allergy_and_symptom_log(self, test_db, sample_user_data):
+        """Test adding allergy and symptom log entries"""
+        user_repo = UserRepository(test_db)
+        user = user_repo.create_user(**sample_user_data)
+
+        allergy_repo = AllergyRepository(test_db)
+        allergy = allergy_repo.add_allergy(
+            user_id=user.id,
+            allergen="Penicillin",
+            reaction="Rash",
+            severity="moderate",
+        )
+
+        symptom_repo = SymptomRepository(test_db)
+        symptom = symptom_repo.log_symptom(
+            user_id=user.id,
+            symptom_description="Mild headache",
+            severity=3,
+        )
+
+        assert allergy is not None
+        assert allergy.user_id == user.id
+        assert symptom is not None
+        assert symptom.user_id == user.id

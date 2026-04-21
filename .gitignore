@@ -85,6 +85,11 @@ coverage.xml
 .streamlit/secrets.toml
 .streamlit/credentials.toml
 
+# React frontend artifacts
+frontend-react/node_modules/
+frontend-react/dist/
+frontend-react/.vite/
+
 # Documentation builds
 docs/_build/
 site/

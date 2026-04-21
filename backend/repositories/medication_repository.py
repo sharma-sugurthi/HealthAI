@@ -82,11 +82,15 @@ class MedicationRepository(BaseRepository[Medication]):
             return None
 
     def discontinue_medication(
-        self, medication_id: int, end_date: Optional[datetime] = None
+        self, medication_id: int, user_id: Optional[int] = None, end_date: Optional[datetime] = None
     ) -> Optional[Medication]:
         """Mark medication as discontinued"""
         try:
-            medication = self.get_by_id(medication_id)
+            query = self.db.query(Medication).filter(Medication.id == medication_id)
+            if user_id is not None:
+                query = query.filter(Medication.user_id == user_id)
+
+            medication = query.first()
             if medication:
                 medication.status = "discontinued"
                 medication.end_date = end_date or datetime.utcnow()

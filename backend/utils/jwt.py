@@ -55,18 +55,24 @@ def create_refresh_token(data: dict) -> str:
     return encoded_jwt
 
 
-def verify_token(token: str) -> Optional[Dict]:
+def verify_token(token: str, expected_type: Optional[str] = None) -> Optional[Dict]:
     """
     Verify and decode a JWT token.
 
     Args:
         token: JWT token to verify
+        expected_type: Optional expected token type (e.g., "access")
 
     Returns:
         Decoded token payload or None if invalid
     """
     try:
         payload = jwt.decode(token, config.SECRET_KEY, algorithms=[config.JWT_ALGORITHM])
+        if expected_type and payload.get("type") != expected_type:
+            logger.warning(
+                f"Token type mismatch: expected={expected_type}, received={payload.get('type')}"
+            )
+            return None
         return payload
     except JWTError as e:
         logger.warning(f"Token verification failed: {str(e)}")

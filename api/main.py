@@ -6,6 +6,7 @@ Main API entry point with all routers and middleware.
 from fastapi import FastAPI, Request, status
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
+from sqlalchemy import text
 from slowapi import Limiter, _rate_limit_exceeded_handler
 from slowapi.errors import RateLimitExceeded
 from slowapi.util import get_remote_address
@@ -60,9 +61,11 @@ async def root():
     """Root endpoint"""
     return {
         "message": "Welcome to HealthAI API",
-        "version": "1.0.0",
+        "version": "2.0.0",
+        "environment": config.ENVIRONMENT,
         "docs": "/docs",
         "health": "/health",
+        "api_prefix": config.API_PREFIX,
     }
 
 
@@ -77,7 +80,7 @@ async def health_check():
 
         db_manager = get_db_manager()
         session = db_manager.get_session()
-        session.execute("SELECT 1")
+        session.execute(text("SELECT 1"))
         session.close()
         db_status = "healthy"
     except Exception as e:
@@ -93,7 +96,8 @@ async def health_check():
         "status": overall_status,
         "database": db_status,
         "ai_service": ai_status,
-        "version": "1.0.0",
+        "version": "2.0.0",
+        "environment": config.ENVIRONMENT,
     }
 
 

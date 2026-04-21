@@ -9,6 +9,7 @@ from sqlalchemy import create_engine
 from sqlalchemy.orm import Session, sessionmaker
 from sqlalchemy.pool import StaticPool
 
+import backend.models  # noqa: F401 - ensures all models are registered in Base metadata
 from backend.models.user import Base
 from config import config
 
@@ -35,14 +36,16 @@ class DatabaseManager:
             # PostgreSQL/MySQL configuration with connection pooling
             self.engine = create_engine(
                 self.database_url,
-                pool_size=10,
-                max_overflow=20,
-                pool_pre_ping=True,  # Verify connections before using
-                pool_recycle=3600,  # Recycle connections after 1 hour
+                pool_size=config.DB_POOL_SIZE,
+                max_overflow=config.DB_MAX_OVERFLOW,
+                pool_pre_ping=config.DB_POOL_PRE_PING,
+                pool_recycle=config.DB_POOL_RECYCLE,
             )
 
-        # Create all tables
-        Base.metadata.create_all(self.engine)
+        # Create all tables for dev/test convenience.
+        # In production, prefer migration tools (e.g., Alembic) and set DB_AUTO_CREATE_SCHEMA=false.
+        if config.DB_AUTO_CREATE_SCHEMA:
+            Base.metadata.create_all(self.engine)
 
         # Create session factory
         self.SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=self.engine)

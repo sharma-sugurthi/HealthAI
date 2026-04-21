@@ -28,19 +28,23 @@ class BaseRepository(Generic[ModelType]):
         """
         self.model = model
         self.session = session
+        # Backward-compatible alias used by some repositories
+        self.db = session
 
-    def create(self, **kwargs) -> ModelType:
+    def create(self, instance: Optional[ModelType] = None, **kwargs) -> ModelType:
         """
         Create a new record.
 
         Args:
+            instance: Optional pre-built model instance
             **kwargs: Model attributes
 
         Returns:
             Created model instance
         """
         try:
-            instance = self.model(**kwargs)
+            if instance is None:
+                instance = self.model(**kwargs)
             self.session.add(instance)
             self.session.commit()
             self.session.refresh(instance)

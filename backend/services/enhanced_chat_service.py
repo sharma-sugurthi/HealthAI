@@ -48,6 +48,16 @@ class EnhancedChatService:
             }
         """
         try:
+            if not self.ai_client:
+                return {
+                    "message": message,
+                    "response": "AI service is currently unavailable. Please try again shortly.",
+                    "safety_flags": ["AI_UNAVAILABLE"],
+                    "has_emergency": False,
+                    "context_used": False,
+                    "severity": "low",
+                }
+
             # 1. Check for emergency symptoms in user message
             has_emergency = self.safety_checker.detect_emergency_symptoms(message)
             if has_emergency:
@@ -113,6 +123,14 @@ class EnhancedChatService:
             Detailed symptom analysis with recommendations
         """
         try:
+            if not self.ai_client:
+                return {
+                    "symptoms": symptoms,
+                    "analysis": "AI service is currently unavailable. Please try again shortly.",
+                    "safety_flags": ["AI_UNAVAILABLE"],
+                    "has_emergency": False,
+                }
+
             # Check for emergency symptoms
             if self.safety_checker.detect_emergency_symptoms(symptoms):
                 return self._handle_emergency_response(user_id, symptoms)
@@ -176,6 +194,14 @@ class EnhancedChatService:
             Comprehensive treatment plan
         """
         try:
+            if not self.ai_client:
+                return {
+                    "condition": condition,
+                    "treatment_plan": "AI service is currently unavailable. Please try again shortly.",
+                    "safety_flags": ["AI_UNAVAILABLE"],
+                    "personalized": False,
+                }
+
             # Get patient context
             patient_context = self.context_service.get_patient_context(user_id)
 

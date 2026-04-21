@@ -22,6 +22,11 @@ class Config:
 
     # Database Settings
     DATABASE_URL: str = os.getenv("DATABASE_URL", "sqlite:///healthai.db")
+    DB_POOL_SIZE: int = int(os.getenv("DB_POOL_SIZE", "10"))
+    DB_MAX_OVERFLOW: int = int(os.getenv("DB_MAX_OVERFLOW", "20"))
+    DB_POOL_RECYCLE: int = int(os.getenv("DB_POOL_RECYCLE", "3600"))
+    DB_POOL_PRE_PING: bool = os.getenv("DB_POOL_PRE_PING", "true").lower() == "true"
+    DB_AUTO_CREATE_SCHEMA: bool = os.getenv("DB_AUTO_CREATE_SCHEMA", "true").lower() == "true"
 
     # Security Settings
     SECRET_KEY: str = os.getenv("SECRET_KEY", "dev-secret-key-change-in-production")
@@ -38,7 +43,7 @@ class Config:
     OPENROUTER_TITLE: str = os.getenv("OPENROUTER_TITLE", "HealthAI Assistant")
 
     # AI Model Settings
-    AI_MODEL: str = os.getenv("AI_MODEL", "x-ai/grok-beta")
+    AI_MODEL: str = os.getenv("AI_MODEL", "qwen/qwen3.6-plus-preview:free")
     AI_MAX_RETRIES: int = int(os.getenv("AI_MAX_RETRIES", "3"))
     AI_RETRY_DELAY: int = int(os.getenv("AI_RETRY_DELAY", "2"))
     AI_TEMPERATURE: float = float(os.getenv("AI_TEMPERATURE", "0.7"))

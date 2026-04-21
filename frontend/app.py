@@ -15,7 +15,6 @@ import streamlit as st
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from backend.exceptions.auth_exceptions import InvalidCredentialsError, UserAlreadyExistsError
-from backend.exceptions.validation_exceptions import ValidationError
 from backend.services.auth_service import AuthService
 from backend.services.chat_service import ChatService
 from backend.services.health_service import HealthService
@@ -23,6 +22,7 @@ from backend.services.treatment_service import TreatmentService
 from backend.utils.database import get_db_manager
 from backend.utils.logger import get_logger
 from config import config
+from validation import ValidationError
 
 # Initialize logger
 logger = get_logger(__name__)
@@ -65,6 +65,131 @@ if "user" not in st.session_state:
     st.session_state.user = None
 if "chat_messages" not in st.session_state:
     st.session_state.chat_messages = []
+if "chat_draft_prompt" not in st.session_state:
+    st.session_state.chat_draft_prompt = ""
+
+
+def apply_custom_styles():
+    """Apply modern, clean UI styling."""
+    st.markdown(
+        """
+    <style>
+    :root {
+        --ha-bg: #f8fafc;
+        --ha-surface: #ffffff;
+        --ha-primary: #2563eb;
+        --ha-primary-dark: #1d4ed8;
+        --ha-text: #0f172a;
+        --ha-muted: #64748b;
+        --ha-border: #e2e8f0;
+        --ha-success: #16a34a;
+    }
+
+    .stApp {
+        background: var(--ha-bg);
+        color: var(--ha-text);
+    }
+
+    .main .block-container {
+        padding-top: 1rem;
+        padding-bottom: 1.5rem;
+        max-width: 1200px;
+    }
+
+    [data-testid="stSidebar"] {
+        background: #0b1220;
+        border-right: 1px solid #1e293b;
+    }
+    [data-testid="stSidebar"] * {
+        color: #e2e8f0 !important;
+    }
+
+    .ha-page-title {
+        font-size: 2rem;
+        font-weight: 700;
+        margin-bottom: 0.25rem;
+        color: var(--ha-text);
+    }
+
+    .ha-page-subtitle {
+        color: var(--ha-muted);
+        margin-bottom: 1rem;
+    }
+
+    .ha-glass-card {
+        background: var(--ha-surface);
+        border: 1px solid var(--ha-border);
+        border-radius: 16px;
+        padding: 1rem 1rem;
+        box-shadow: 0 8px 20px rgba(15, 23, 42, 0.04);
+    }
+
+    .healthai-chip {
+        display: inline-block;
+        padding: 0.25rem 0.7rem;
+        border-radius: 999px;
+        border: 1px solid #bfdbfe;
+        background: #eff6ff;
+        color: #1e40af;
+        font-size: 0.78rem;
+        font-weight: 600;
+        margin-right: 0.4rem;
+        margin-bottom: 0.5rem;
+    }
+
+    .tool-card {
+        border: 1px solid var(--ha-border);
+        border-radius: 14px;
+        padding: 0.95rem;
+        margin-bottom: 0.85rem;
+        background: var(--ha-surface);
+        box-shadow: 0 6px 14px rgba(15, 23, 42, 0.03);
+    }
+    .tool-title {
+        font-weight: 700;
+        margin-bottom: 0.4rem;
+        color: #1e293b;
+    }
+    .workspace-title {
+        margin-bottom: 0.2rem;
+    }
+    .workspace-subtitle {
+        color: var(--ha-muted);
+        margin-bottom: 0.9rem;
+    }
+
+    .stButton > button {
+        border-radius: 10px;
+        border: 1px solid var(--ha-border);
+        font-weight: 600;
+    }
+    .stButton > button[kind="primary"] {
+        background: var(--ha-primary);
+        border-color: var(--ha-primary);
+        color: white;
+    }
+    .stButton > button[kind="primary"]:hover {
+        background: var(--ha-primary-dark);
+        border-color: var(--ha-primary-dark);
+        color: white;
+    }
+
+    .stTextInput input,
+    .stTextArea textarea,
+    .stNumberInput input,
+    .stSelectbox div[data-baseweb="select"] {
+        border-radius: 10px !important;
+    }
+    </style>
+    """,
+        unsafe_allow_html=True,
+    )
+
+
+def render_page_header(title: str, subtitle: str):
+    """Reusable page header."""
+    st.markdown(f"<div class='ha-page-title'>{title}</div>", unsafe_allow_html=True)
+    st.markdown(f"<div class='ha-page-subtitle'>{subtitle}</div>", unsafe_allow_html=True)
 
 
 def show_medical_disclaimer():
@@ -81,101 +206,124 @@ def show_medical_disclaimer():
 
 def login_page():
     """Display login/registration page"""
-    st.title(f"🏥 {config.APP_NAME} - Intelligent Healthcare Assistant")
+    left, right = st.columns([1.1, 1], gap="large")
 
-    st.markdown(
-        """
-    Welcome to HealthAI, your intelligent healthcare companion powered by advanced AI technology.
-    
-    **Features:**
-    - 💬 AI-Powered Health Chat
-    - 🔍 Symptom Checker
-    - 📋 Treatment Plan Generator
-    - 📊 Health Analytics Dashboard
-    """
-    )
+    with left:
+        render_page_header(
+            "HealthAI Care Platform",
+            "A modern AI-assisted healthcare workspace for consultations, plans, and health tracking.",
+        )
+        st.markdown(
+            """
+        <div class="ha-glass-card">
+            <div style="font-weight:700; margin-bottom:0.6rem;">Why HealthAI</div>
+            <ul style="margin:0; padding-left:1.1rem; color:#334155; line-height:1.7;">
+                <li>Structured patient conversations with medical disclaimers</li>
+                <li>Symptom analysis and treatment drafting in one workspace</li>
+                <li>Personal health metric tracking with trend visualization</li>
+                <li>Secure account-based data history</li>
+            </ul>
+        </div>
+        """,
+            unsafe_allow_html=True,
+        )
+
+    with right:
+        st.markdown('<div class="ha-glass-card">', unsafe_allow_html=True)
+        st.markdown("#### Account Access")
+        st.caption("Login or create your account to continue.")
+
+        tab1, tab2 = st.tabs(["Login", "Register"])
+
+        with tab1:
+            login_username = st.text_input("Username", key="login_username")
+            login_password = st.text_input("Password", type="password", key="login_password")
+
+            if st.button("Login", type="primary", use_container_width=True):
+                if not login_username or not login_password:
+                    st.error("Please enter both username and password")
+                else:
+                    try:
+                        session = db_manager.get_session()
+                        auth_service = AuthService(session)
+                        user_data = auth_service.login_user(login_username, login_password)
+
+                        st.session_state.logged_in = True
+                        st.session_state.user = user_data
+                        st.success(f"Welcome back, {user_data['full_name']}!")
+                        logger.info(f"User logged in: {login_username}")
+                        st.rerun()
+
+                    except InvalidCredentialsError:
+                        st.error("Invalid username or password")
+                    except ValidationError as e:
+                        st.error(str(e))
+                    except Exception as e:
+                        logger.error(f"Login error: {str(e)}")
+                        st.error("An error occurred during login. Please try again.")
+                    finally:
+                        session.close()
+
+        with tab2:
+            reg_username = st.text_input("Username", key="reg_username")
+            reg_password = st.text_input("Password", type="password", key="reg_password")
+            reg_password_confirm = st.text_input(
+                "Confirm Password", type="password", key="reg_password_confirm"
+            )
+            reg_full_name = st.text_input("Full Name", key="reg_full_name")
+            reg_age = st.number_input("Age", min_value=1, max_value=120, value=25, key="reg_age")
+            reg_gender = st.selectbox(
+                "Gender", ["Male", "Female", "Other", "Prefer not to say"], key="reg_gender"
+            )
+
+            if st.button("Create Account", type="primary", use_container_width=True):
+                if not all([reg_username, reg_password, reg_full_name]):
+                    st.error("Please fill in all required fields")
+                elif reg_password != reg_password_confirm:
+                    st.error("Passwords do not match")
+                else:
+                    try:
+                        session = db_manager.get_session()
+                        auth_service = AuthService(session)
+                        auth_service.register_user(
+                            username=reg_username,
+                            password=reg_password,
+                            full_name=reg_full_name,
+                            age=reg_age,
+                            gender=reg_gender,
+                        )
+                        st.success("Account created successfully! Please login.")
+                        logger.info(f"New user registered: {reg_username}")
+
+                    except UserAlreadyExistsError as e:
+                        st.error(str(e))
+                    except ValidationError as e:
+                        st.error(str(e))
+                    except Exception as e:
+                        logger.error(f"Registration error: {str(e)}")
+                        st.error("Registration failed. Please check details and retry.")
+                    finally:
+                        session.close()
+
+        st.markdown("</div>", unsafe_allow_html=True)
 
     show_medical_disclaimer()
 
-    tab1, tab2 = st.tabs(["Login", "Register"])
-
-    with tab1:
-        st.subheader("Login to Your Account")
-        login_username = st.text_input("Username", key="login_username")
-        login_password = st.text_input("Password", type="password", key="login_password")
-
-        if st.button("Login", type="primary"):
-            if not login_username or not login_password:
-                st.error("Please enter both username and password")
-            else:
-                try:
-                    session = db_manager.get_session()
-                    auth_service = AuthService(session)
-                    user_data = auth_service.login_user(login_username, login_password)
-
-                    st.session_state.logged_in = True
-                    st.session_state.user = user_data
-                    st.success(f"Welcome back, {user_data['full_name']}!")
-                    logger.info(f"User logged in: {login_username}")
-                    st.rerun()
-
-                except InvalidCredentialsError:
-                    st.error("Invalid username or password")
-                except ValidationError as e:
-                    st.error(str(e))
-                except Exception as e:
-                    logger.error(f"Login error: {str(e)}")
-                    st.error("An error occurred during login. Please try again.")
-                finally:
-                    session.close()
-
-    with tab2:
-        st.subheader("Create New Account")
-        reg_username = st.text_input("Username", key="reg_username")
-        reg_password = st.text_input("Password", type="password", key="reg_password")
-        reg_password_confirm = st.text_input(
-            "Confirm Password", type="password", key="reg_password_confirm"
-        )
-        reg_full_name = st.text_input("Full Name", key="reg_full_name")
-        reg_age = st.number_input("Age", min_value=1, max_value=120, value=25, key="reg_age")
-        reg_gender = st.selectbox(
-            "Gender", ["Male", "Female", "Other", "Prefer not to say"], key="reg_gender"
-        )
-
-        if st.button("Register", type="primary"):
-            if not all([reg_username, reg_password, reg_full_name]):
-                st.error("Please fill in all required fields")
-            elif reg_password != reg_password_confirm:
-                st.error("Passwords do not match")
-            else:
-                try:
-                    session = db_manager.get_session()
-                    auth_service = AuthService(session)
-                    auth_service.register_user(
-                        username=reg_username,
-                        password=reg_password,
-                        full_name=reg_full_name,
-                        age=reg_age,
-                        gender=reg_gender,
-                    )
-                    st.success("Account created successfully! Please login.")
-                    logger.info(f"New user registered: {reg_username}")
-
-                except UserAlreadyExistsError as e:
-                    st.error(str(e))
-                except ValidationError as e:
-                    st.error(str(e))
-                except Exception as e:
-                    logger.error(f"Registration error: {str(e)}")
-                    st.error(f"Registration failed: {str(e)}")
-                finally:
-                    session.close()
-
 
 def patient_chat_page():
-    """AI-powered patient chat interface"""
-    st.title("💬 Patient Chat")
-    st.markdown("Ask me anything about your health concerns. I'm here to help!")
+    """ChatGPT-style AI care workspace with embedded clinical tools."""
+    render_page_header(
+        "🧠 AI Care Workspace",
+        "Conversational care assistant with embedded symptom and treatment tools.",
+    )
+    st.markdown(
+        """
+    <span class="healthai-chip">Chat</span>
+    <span class="healthai-chip">Symptom Analysis</span>
+    <span class="healthai-chip">Treatment Guidance</span>
+    """,
+        unsafe_allow_html=True,
+    )
 
     # Load chat history
     if not st.session_state.chat_messages:
@@ -194,40 +342,145 @@ def patient_chat_page():
         except Exception as e:
             logger.error(f"Error loading chat history: {str(e)}")
 
-    # Display chat messages
-    for message in st.session_state.chat_messages:
-        with st.chat_message(message["role"]):
-            st.markdown(message["content"])
+    left_col, right_col = st.columns([2.4, 1], gap="large")
 
-    # Chat input
-    if prompt := st.chat_input("Type your health question here..."):
-        # Add user message
-        st.session_state.chat_messages.append({"role": "user", "content": prompt})
-        with st.chat_message("user"):
-            st.markdown(prompt)
+    with left_col:
+        quick_cols = st.columns(3)
+        with quick_cols[0]:
+            if st.button("Headache + Fever", use_container_width=True, key="quick_prompt_1"):
+                st.session_state.chat_draft_prompt = (
+                    "I have had headache and mild fever for the last 2 days. What should I do?"
+                )
+        with quick_cols[1]:
+            if st.button("Diet Advice", use_container_width=True, key="quick_prompt_2"):
+                st.session_state.chat_draft_prompt = (
+                    "Suggest a one-day healthy meal plan for weight management."
+                )
+        with quick_cols[2]:
+            if st.button("When to See Doctor", use_container_width=True, key="quick_prompt_3"):
+                st.session_state.chat_draft_prompt = (
+                    "How do I know if my symptoms require urgent medical care?"
+                )
 
-        # Get AI response
-        with st.chat_message("assistant"):
-            with st.spinner("Thinking..."):
+        # Display chat messages
+        for message in st.session_state.chat_messages:
+            with st.chat_message(message["role"]):
+                st.markdown(message["content"])
+
+        # Chat input
+        prompt = st.chat_input("Message HealthAI...")
+        if not prompt and st.session_state.chat_draft_prompt:
+            prompt = st.session_state.chat_draft_prompt
+            st.session_state.chat_draft_prompt = ""
+
+        if prompt:
+            # Add user message
+            st.session_state.chat_messages.append({"role": "user", "content": prompt})
+            with st.chat_message("user"):
+                st.markdown(prompt)
+
+            # Get AI response
+            with st.chat_message("assistant"):
+                with st.spinner("Thinking..."):
+                    try:
+                        session = db_manager.get_session()
+                        chat_service = ChatService(session)
+                        result = chat_service.send_message(st.session_state.user["id"], prompt)
+                        response = result["response"]
+
+                        st.markdown(response)
+                        st.session_state.chat_messages.append(
+                            {"role": "assistant", "content": response}
+                        )
+
+                        session.close()
+                    except Exception as e:
+                        logger.error(f"Chat error: {str(e)}")
+                        error_msg = "I'm experiencing technical difficulties. Please try again."
+                        st.error(error_msg)
+                        st.session_state.chat_messages.append(
+                            {"role": "assistant", "content": error_msg}
+                        )
+
+    with right_col:
+        st.markdown("<div class='tool-card'>", unsafe_allow_html=True)
+        st.markdown("<div class='tool-title'>Patient Snapshot</div>", unsafe_allow_html=True)
+        st.caption(
+            f"{st.session_state.user['full_name']} • {st.session_state.user['age']} yrs • {st.session_state.user['gender']}"
+        )
+        if st.button("🧹 Clear Chat", use_container_width=True):
+            st.session_state.chat_messages = []
+            st.rerun()
+        st.markdown("</div>", unsafe_allow_html=True)
+
+        st.markdown("<div class='tool-card'>", unsafe_allow_html=True)
+        st.markdown("<div class='tool-title'>🔍 Symptom Analyzer</div>", unsafe_allow_html=True)
+        symptom_text = st.text_area(
+            "Symptoms",
+            placeholder="e.g., headache for 3 days with mild fever and fatigue",
+            height=110,
+            key="workspace_symptoms_input",
+            label_visibility="collapsed",
+        )
+        if st.button("Analyze", key="workspace_analyze_btn", use_container_width=True):
+            if not symptom_text.strip():
+                st.warning("Enter symptoms first.")
+            else:
                 try:
                     session = db_manager.get_session()
                     chat_service = ChatService(session)
-                    result = chat_service.send_message(st.session_state.user["id"], prompt)
-                    response = result["response"]
-
-                    st.markdown(response)
+                    result = chat_service.analyze_symptoms(st.session_state.user["id"], symptom_text)
+                    analysis = f"### Symptom Analysis\n\n{result['analysis']}"
                     st.session_state.chat_messages.append(
-                        {"role": "assistant", "content": response}
+                        {
+                            "role": "assistant",
+                            "content": analysis,
+                        }
                     )
-
                     session.close()
+                    st.success("Analysis added to chat.")
+                    st.rerun()
                 except Exception as e:
-                    logger.error(f"Chat error: {str(e)}")
-                    error_msg = "I'm experiencing technical difficulties. Please try again."
-                    st.error(error_msg)
-                    st.session_state.chat_messages.append(
-                        {"role": "assistant", "content": error_msg}
+                    logger.error(f"Workspace symptom analysis error: {str(e)}")
+                    st.error("Failed to analyze symptoms.")
+        st.markdown("</div>", unsafe_allow_html=True)
+
+        st.markdown("<div class='tool-card'>", unsafe_allow_html=True)
+        st.markdown("<div class='tool-title'>📋 Treatment Draft</div>", unsafe_allow_html=True)
+        condition = st.text_input(
+            "Condition",
+            placeholder="e.g., Type 2 Diabetes",
+            key="workspace_condition_input",
+            label_visibility="collapsed",
+        )
+        if st.button("Generate Draft", key="workspace_plan_btn", use_container_width=True):
+            if not condition.strip():
+                st.warning("Enter a condition first.")
+            else:
+                try:
+                    session = db_manager.get_session()
+                    chat_service = ChatService(session)
+                    patient_info = {
+                        "age": st.session_state.user["age"],
+                        "gender": st.session_state.user["gender"],
+                    }
+                    plan = chat_service.generate_treatment_plan(
+                        st.session_state.user["id"], condition, patient_info
                     )
+                    st.session_state.chat_messages.append(
+                        {
+                            "role": "assistant",
+                            "content": f"### Treatment Plan Draft: {condition}\n\n{plan}",
+                        }
+                    )
+                    session.close()
+                    st.success("Treatment draft added to chat.")
+                    st.rerun()
+                except Exception as e:
+                    logger.error(f"Workspace treatment plan error: {str(e)}")
+                    st.error("Failed to generate treatment plan.")
+        st.caption("For educational use only. Always verify with a clinician.")
+        st.markdown("</div>", unsafe_allow_html=True)
 
 
 def symptom_checker_page():
@@ -271,7 +524,10 @@ def symptom_checker_page():
 
 def treatment_plan_page():
     """Treatment plan generator"""
-    st.title("📋 Treatment Plans")
+    render_page_header(
+        "📋 Treatment Plans",
+        "Generate practical treatment drafts and manage your saved plans.",
+    )
 
     # Initialize session state for generated plan
     if "generated_plan" not in st.session_state:
@@ -377,7 +633,10 @@ def treatment_plan_page():
 
 def health_analytics_page():
     """Health analytics dashboard"""
-    st.title("📊 Health Analytics")
+    render_page_header(
+        "📊 Health Analytics",
+        "Track key health metrics and visualize trends over time.",
+    )
 
     tab1, tab2 = st.tabs(["Add Health Data", "View Analytics"])
 
@@ -532,18 +791,22 @@ def health_analytics_page():
 def main():
     """Main application logic"""
 
+    apply_custom_styles()
+
     if not st.session_state.logged_in:
         login_page()
     else:
         # Sidebar navigation
-        st.sidebar.title(f"Welcome, {st.session_state.user['full_name']}!")
+        st.sidebar.title("🏥 HealthAI")
+        st.sidebar.caption(f"Signed in as {st.session_state.user['full_name']}")
+        st.sidebar.success("System Status: Online")
 
         st.sidebar.markdown("---")
 
         # Navigation menu
         page = st.sidebar.radio(
-            "Navigation",
-            ["💬 Patient Chat", "🔍 Symptom Checker", "📋 Treatment Plans", "📊 Health Analytics"],
+            "Workspace",
+            ["🧠 AI Care Workspace", "📋 Treatment Plans", "📊 Health Analytics"],
             key="navigation",
         )
 
@@ -560,10 +823,8 @@ def main():
         show_medical_disclaimer()
 
         # Route to selected page
-        if page == "💬 Patient Chat":
+        if page == "🧠 AI Care Workspace":
             patient_chat_page()
-        elif page == "🔍 Symptom Checker":
-            symptom_checker_page()
         elif page == "📋 Treatment Plans":
             treatment_plan_page()
         elif page == "📊 Health Analytics":

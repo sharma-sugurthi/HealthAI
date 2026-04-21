@@ -5,7 +5,7 @@ Pydantic schemas for health metrics.
 from datetime import datetime
 from typing import Optional
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, ConfigDict, Field
 
 
 class HealthMetricCreate(BaseModel):
@@ -26,9 +26,7 @@ class HealthMetricResponse(BaseModel):
     unit: str
     notes: Optional[str]
     recorded_at: datetime
-
-    class Config:
-        from_attributes = True
+    model_config = ConfigDict(from_attributes=True)
 
 
 class HealthStatisticsResponse(BaseModel):

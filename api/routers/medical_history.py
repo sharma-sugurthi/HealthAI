@@ -18,7 +18,6 @@ from api.schemas.medical_history import (
     SymptomLogCreate,
     SymptomLogResponse,
 )
-from backend.models.user import User
 from backend.repositories.allergy_repository import AllergyRepository
 from backend.repositories.medical_history_repository import MedicalHistoryRepository
 from backend.repositories.medication_repository import MedicationRepository
@@ -33,13 +32,13 @@ router = APIRouter(prefix="/medical-history", tags=["Medical History"])
 )
 def add_medical_condition(
     condition: MedicalConditionCreate,
-    current_user: User = Depends(get_current_user),
+    current_user: dict = Depends(get_current_user),
     db: Session = Depends(get_db),
 ):
     """Add a new medical condition"""
     repo = MedicalHistoryRepository(db)
     new_condition = repo.add_condition(
-        user_id=current_user.id,
+        user_id=current_user["id"],
         condition_name=condition.condition_name,
         status=condition.status,
         severity=condition.severity,
@@ -54,12 +53,12 @@ def add_medical_condition(
 @router.get("/conditions", response_model=List[MedicalConditionResponse])
 def get_medical_conditions(
     status: str = None,
-    current_user: User = Depends(get_current_user),
+    current_user: dict = Depends(get_current_user),
     db: Session = Depends(get_db),
 ):
     """Get all medical conditions for current user"""
     repo = MedicalHistoryRepository(db)
-    conditions = repo.get_by_user(current_user.id, status=status)
+    conditions = repo.get_by_user(current_user["id"], status=status)
     return [c.to_dict() for c in conditions]
 
 
@@ -67,13 +66,13 @@ def get_medical_conditions(
 @router.post("/medications", response_model=MedicationResponse, status_code=status.HTTP_201_CREATED)
 def add_medication(
     medication: MedicationCreate,
-    current_user: User = Depends(get_current_user),
+    current_user: dict = Depends(get_current_user),
     db: Session = Depends(get_db),
 ):
     """Add a new medication"""
     repo = MedicationRepository(db)
     new_med = repo.add_medication(
-        user_id=current_user.id,
+        user_id=current_user["id"],
         medication_name=medication.medication_name,
         dosage=medication.dosage,
         frequency=medication.frequency,
@@ -90,24 +89,24 @@ def add_medication(
 @router.get("/medications", response_model=List[MedicationResponse])
 def get_medications(
     status: str = None,
-    current_user: User = Depends(get_current_user),
+    current_user: dict = Depends(get_current_user),
     db: Session = Depends(get_db),
 ):
     """Get all medications for current user"""
     repo = MedicationRepository(db)
-    medications = repo.get_by_user(current_user.id, status=status)
+    medications = repo.get_by_user(current_user["id"], status=status)
     return [m.to_dict() for m in medications]
 
 
 @router.patch("/medications/{medication_id}/discontinue", response_model=MedicationResponse)
 def discontinue_medication(
     medication_id: int,
-    current_user: User = Depends(get_current_user),
+    current_user: dict = Depends(get_current_user),
     db: Session = Depends(get_db),
 ):
     """Mark medication as discontinued"""
     repo = MedicationRepository(db)
-    medication = repo.discontinue_medication(medication_id)
+    medication = repo.discontinue_medication(medication_id, user_id=current_user["id"])
     if not medication:
         raise HTTPException(status_code=404, detail="Medication not found")
     return medication.to_dict()
@@ -117,13 +116,13 @@ def discontinue_medication(
 @router.post("/allergies", response_model=AllergyResponse, status_code=status.HTTP_201_CREATED)
 def add_allergy(
     allergy: AllergyCreate,
-    current_user: User = Depends(get_current_user),
+    current_user: dict = Depends(get_current_user),
     db: Session = Depends(get_db),
 ):
     """Add a new allergy"""
     repo = AllergyRepository(db)
     new_allergy = repo.add_allergy(
-        user_id=current_user.id,
+        user_id=current_user["id"],
         allergen=allergy.allergen,
         reaction=allergy.reaction,
         severity=allergy.severity,
@@ -139,12 +138,12 @@ def add_allergy(
 
 @router.get("/allergies", response_model=List[AllergyResponse])
 def get_allergies(
-    current_user: User = Depends(get_current_user),
+    current_user: dict = Depends(get_current_user),
     db: Session = Depends(get_db),
 ):
     """Get all allergies for current user"""
     repo = AllergyRepository(db)
-    allergies = repo.get_by_user(current_user.id)
+    allergies = repo.get_by_user(current_user["id"])
     return [a.to_dict() for a in allergies]
 
 
@@ -152,13 +151,13 @@ def get_allergies(
 @router.post("/symptoms", response_model=SymptomLogResponse, status_code=status.HTTP_201_CREATED)
 def log_symptom(
     symptom: SymptomLogCreate,
-    current_user: User = Depends(get_current_user),
+    current_user: dict = Depends(get_current_user),
     db: Session = Depends(get_db),
 ):
     """Log a new symptom"""
     repo = SymptomRepository(db)
     new_symptom = repo.log_symptom(
-        user_id=current_user.id,
+        user_id=current_user["id"],
         symptom_description=symptom.symptom_description,
         severity=symptom.severity,
         body_part=symptom.body_part,
@@ -181,22 +180,22 @@ def log_symptom(
 @router.get("/symptoms", response_model=List[SymptomLogResponse])
 def get_symptoms(
     limit: int = 50,
-    current_user: User = Depends(get_current_user),
+    current_user: dict = Depends(get_current_user),
     db: Session = Depends(get_db),
 ):
     """Get symptom logs for current user"""
     repo = SymptomRepository(db)
-    symptoms = repo.get_by_user(current_user.id, limit=limit)
+    symptoms = repo.get_by_user(current_user["id"], limit=limit)
     return [s.to_dict() for s in symptoms]
 
 
 @router.get("/symptoms/recent", response_model=List[SymptomLogResponse])
 def get_recent_symptoms(
     days: int = 30,
-    current_user: User = Depends(get_current_user),
+    current_user: dict = Depends(get_current_user),
     db: Session = Depends(get_db),
 ):
     """Get recent symptoms (last N days)"""
     repo = SymptomRepository(db)
-    symptoms = repo.get_recent_symptoms(current_user.id, days=days)
+    symptoms = repo.get_recent_symptoms(current_user["id"], days=days)
     return [s.to_dict() for s in symptoms]

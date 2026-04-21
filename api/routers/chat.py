@@ -18,6 +18,7 @@ from api.schemas.chat import (
 )
 from backend.services.chat_service import ChatService
 from backend.utils.logger import get_logger
+from validation import ValidationError
 
 logger = get_logger(__name__)
 router = APIRouter()
@@ -45,6 +46,8 @@ async def send_message(
         result = chat_service.send_message(current_user["id"], message_data.message)
         return ChatMessageResponse(**result)
 
+    except ValidationError as e:
+        raise HTTPException(status_code=status.HTTP_422_UNPROCESSABLE_ENTITY, detail=str(e))
     except Exception as e:
         logger.error(f"Chat error: {str(e)}")
         raise HTTPException(
@@ -101,6 +104,8 @@ async def analyze_symptoms(
         result = chat_service.analyze_symptoms(current_user["id"], symptom_data.symptoms)
         return SymptomAnalysisResponse(**result)
 
+    except ValidationError as e:
+        raise HTTPException(status_code=status.HTTP_422_UNPROCESSABLE_ENTITY, detail=str(e))
     except Exception as e:
         logger.error(f"Symptom analysis error: {str(e)}")
         raise HTTPException(
@@ -134,6 +139,9 @@ async def generate_treatment_plan(
         auth_service = AuthService(db)
         user = auth_service.get_user_by_id(current_user["id"])
 
+        if not user:
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="User not found")
+
         patient_info = {"age": user["age"], "gender": user["gender"]}
 
         plan = chat_service.generate_treatment_plan(
@@ -142,6 +150,10 @@ async def generate_treatment_plan(
 
         return TreatmentPlanGenerationResponse(condition=plan_request.condition, plan=plan)
 
+    except HTTPException:
+        raise
+    except ValidationError as e:
+        raise HTTPException(status_code=status.HTTP_422_UNPROCESSABLE_ENTITY, detail=str(e))
     except Exception as e:
         logger.error(f"Treatment plan generation error: {str(e)}")
         raise HTTPException(

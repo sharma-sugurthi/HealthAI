@@ -2,10 +2,7 @@
 Pydantic schemas for user-related requests and responses.
 """
 
-from datetime import datetime
-from typing import Optional
-
-from pydantic import BaseModel, Field, validator
+from pydantic import BaseModel, ConfigDict, Field, field_validator
 
 
 class UserBase(BaseModel):
@@ -22,9 +19,11 @@ class UserCreate(UserBase):
 
     password: str = Field(..., min_length=6, max_length=100)
 
-    @validator("username")
-    def username_alphanumeric(cls, v):
-        assert v.replace("_", "").isalnum(), "Username must be alphanumeric"
+    @field_validator("username")
+    @classmethod
+    def username_alphanumeric(cls, v: str) -> str:
+        if not v.replace("_", "").isalnum():
+            raise ValueError("Username must be alphanumeric")
         return v
 
 
@@ -39,9 +38,7 @@ class UserResponse(UserBase):
     """Schema for user response"""
 
     id: int
-
-    class Config:
-        from_attributes = True
+    model_config = ConfigDict(from_attributes=True)
 
 
 class TokenResponse(BaseModel):

@@ -5,7 +5,7 @@ Pydantic schemas for medical history API
 from datetime import date, datetime
 from typing import Optional
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, ConfigDict, Field
 
 
 # Medical Condition Schemas
@@ -31,9 +31,7 @@ class MedicalConditionResponse(BaseModel):
     notes: Optional[str]
     created_at: str
     updated_at: str
-
-    class Config:
-        from_attributes = True
+    model_config = ConfigDict(from_attributes=True)
 
 
 # Medication Schemas
@@ -65,9 +63,7 @@ class MedicationResponse(BaseModel):
     prescribing_doctor: Optional[str]
     created_at: str
     updated_at: str
-
-    class Config:
-        from_attributes = True
+    model_config = ConfigDict(from_attributes=True)
 
 
 # Allergy Schemas
@@ -100,9 +96,7 @@ class AllergyResponse(BaseModel):
     notes: Optional[str]
     created_at: str
     updated_at: str
-
-    class Config:
-        from_attributes = True
+    model_config = ConfigDict(from_attributes=True)
 
 
 # Symptom Log Schemas
@@ -143,9 +137,7 @@ class SymptomLogResponse(BaseModel):
     impact_on_life: Optional[str]
     notes: Optional[str]
     logged_at: str
-
-    class Config:
-        from_attributes = True
+    model_config = ConfigDict(from_attributes=True)
 
 
 # Enhanced Chat Schemas
