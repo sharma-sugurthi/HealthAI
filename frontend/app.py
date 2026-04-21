@@ -429,7 +429,9 @@ def patient_chat_page():
                 try:
                     session = db_manager.get_session()
                     chat_service = ChatService(session)
-                    result = chat_service.analyze_symptoms(st.session_state.user["id"], symptom_text)
+                    result = chat_service.analyze_symptoms(
+                        st.session_state.user["id"], symptom_text
+                    )
                     analysis = f"### Symptom Analysis\n\n{result['analysis']}"
                     st.session_state.chat_messages.append(
                         {
