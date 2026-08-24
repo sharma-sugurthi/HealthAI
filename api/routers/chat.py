@@ -47,7 +47,7 @@ async def send_message(
         return ChatMessageResponse(**result)
 
     except ValidationError as e:
-        raise HTTPException(status_code=status.HTTP_422_UNPROCESSABLE_ENTITY, detail=str(e))
+        raise HTTPException(status_code=status.HTTP_422_UNPROCESSABLE_CONTENT, detail=str(e))
     except Exception as e:
         logger.error(f"Chat error: {str(e)}")
         raise HTTPException(
@@ -105,7 +105,7 @@ async def analyze_symptoms(
         return SymptomAnalysisResponse(**result)
 
     except ValidationError as e:
-        raise HTTPException(status_code=status.HTTP_422_UNPROCESSABLE_ENTITY, detail=str(e))
+        raise HTTPException(status_code=status.HTTP_422_UNPROCESSABLE_CONTENT, detail=str(e))
     except Exception as e:
         logger.error(f"Symptom analysis error: {str(e)}")
         raise HTTPException(
@@ -153,7 +153,7 @@ async def generate_treatment_plan(
     except HTTPException:
         raise
     except ValidationError as e:
-        raise HTTPException(status_code=status.HTTP_422_UNPROCESSABLE_ENTITY, detail=str(e))
+        raise HTTPException(status_code=status.HTTP_422_UNPROCESSABLE_CONTENT, detail=str(e))
     except Exception as e:
         logger.error(f"Treatment plan generation error: {str(e)}")
         raise HTTPException(

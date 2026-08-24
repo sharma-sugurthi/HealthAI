@@ -13,6 +13,7 @@ dependencies = [
     "python-jose[cryptography]>=3.3.0",
     "python-multipart>=0.0.6",
     "slowapi>=0.1.9",
+    "psycopg2-binary>=2.9.0",
 ]
 
 [tool.black]

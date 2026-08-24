@@ -2,7 +2,7 @@
 Symptom Log Models - Detailed symptom tracking over time
 """
 
-from datetime import datetime
+from datetime import datetime, timezone, timezone
 
 from sqlalchemy import Column, DateTime, ForeignKey, Integer, String, Text
 from sqlalchemy.orm import relationship
@@ -30,7 +30,7 @@ class SymptomLog(Base):
     aggravating_factors = Column(Text, nullable=True)  # What makes it worse
     impact_on_life = Column(String(50), nullable=True)  # none, mild, moderate, severe
     notes = Column(Text, nullable=True)
-    logged_at = Column(DateTime, default=datetime.utcnow, index=True)
+    logged_at = Column(DateTime, default=lambda: datetime.now(timezone.utc), index=True)
 
     # Relationships
     user = relationship("User", back_populates="symptom_logs")

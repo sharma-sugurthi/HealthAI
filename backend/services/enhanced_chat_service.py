@@ -2,7 +2,7 @@
 Enhanced Chat Service - Intelligent, context-aware medical AI chat
 """
 
-from typing import Dict, List, Optional
+from typing import Any, Dict, List
 
 from sqlalchemy.orm import Session
 
@@ -30,7 +30,7 @@ class EnhancedChatService:
         self.chat_repo = ChatRepository(db)
         self.ai_client = get_ai_client()
 
-    def send_contextual_message(self, user_id: int, message: str) -> Dict[str, any]:
+    def send_contextual_message(self, user_id: int, message: str) -> Dict[str, Any]:
         """
         Send message with full patient context for intelligent response
 
@@ -48,6 +48,11 @@ class EnhancedChatService:
             }
         """
         try:
+            # 1. Check for emergency symptoms in user message
+            has_emergency = self.safety_checker.detect_emergency_symptoms(message)
+            if has_emergency:
+                return self._handle_emergency_response(user_id, message)
+
             if not self.ai_client:
                 return {
                     "message": message,
@@ -57,11 +62,6 @@ class EnhancedChatService:
                     "context_used": False,
                     "severity": "low",
                 }
-
-            # 1. Check for emergency symptoms in user message
-            has_emergency = self.safety_checker.detect_emergency_symptoms(message)
-            if has_emergency:
-                return self._handle_emergency_response(user_id, message)
 
             # 2. Get complete patient context
             patient_context = self.context_service.get_patient_context(user_id)
@@ -111,7 +111,7 @@ class EnhancedChatService:
                 "context_used": False,
             }
 
-    def analyze_symptoms_with_context(self, user_id: int, symptoms: str) -> Dict[str, any]:
+    def analyze_symptoms_with_context(self, user_id: int, symptoms: str) -> Dict[str, Any]:
         """
         Comprehensive symptom analysis with patient history
 
@@ -123,6 +123,10 @@ class EnhancedChatService:
             Detailed symptom analysis with recommendations
         """
         try:
+            # Check for emergency symptoms
+            if self.safety_checker.detect_emergency_symptoms(symptoms):
+                return self._handle_emergency_response(user_id, symptoms)
+
             if not self.ai_client:
                 return {
                     "symptoms": symptoms,
@@ -130,10 +134,6 @@ class EnhancedChatService:
                     "safety_flags": ["AI_UNAVAILABLE"],
                     "has_emergency": False,
                 }
-
-            # Check for emergency symptoms
-            if self.safety_checker.detect_emergency_symptoms(symptoms):
-                return self._handle_emergency_response(user_id, symptoms)
 
             # Get patient context
             patient_context = self.context_service.get_patient_context(user_id)
@@ -182,7 +182,7 @@ class EnhancedChatService:
                 "has_emergency": False,
             }
 
-    def generate_treatment_plan_with_context(self, user_id: int, condition: str) -> Dict[str, any]:
+    def generate_treatment_plan_with_context(self, user_id: int, condition: str) -> Dict[str, Any]:
         """
         Generate personalized treatment plan with patient context
 
@@ -281,9 +281,12 @@ Your symptoms may indicate a medical emergency. Please:
         return {
             "message": message,
             "response": emergency_response,
+            "symptoms": message,
+            "analysis": emergency_response,
             "safety_flags": ["EMERGENCY_DETECTED"],
             "has_emergency": True,
             "context_used": False,
+            "severity": "high",
         }
 
     def _add_safety_warnings(

@@ -2,7 +2,7 @@
 Medication Repository - Manages medication data
 """
 
-from datetime import datetime
+from datetime import datetime, timezone, timezone
 from typing import List, Optional
 
 from sqlalchemy import and_, desc
@@ -93,8 +93,8 @@ class MedicationRepository(BaseRepository[Medication]):
             medication = query.first()
             if medication:
                 medication.status = "discontinued"
-                medication.end_date = end_date or datetime.utcnow()
-                medication.updated_at = datetime.utcnow()
+                medication.end_date = end_date or datetime.now(timezone.utc)
+                medication.updated_at = datetime.now(timezone.utc)
                 self.db.commit()
                 logger.info(f"Discontinued medication {medication_id}")
                 return medication

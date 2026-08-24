@@ -2,7 +2,7 @@
 Treatment plan model for storing user treatment plans.
 """
 
-from datetime import datetime
+from datetime import datetime, timezone, timezone
 
 from sqlalchemy import Column, DateTime, ForeignKey, Index, Integer, String, Text
 from sqlalchemy.orm import relationship
@@ -20,7 +20,7 @@ class TreatmentPlan(Base):
     title = Column(String(200), nullable=False)
     condition = Column(String(200), nullable=False, index=True)
     plan_details = Column(Text, nullable=False)
-    created_at = Column(DateTime, default=datetime.utcnow, index=True)
+    created_at = Column(DateTime, default=lambda: datetime.now(timezone.utc), index=True)
 
     # Relationships
     user = relationship("User", back_populates="treatment_plans")

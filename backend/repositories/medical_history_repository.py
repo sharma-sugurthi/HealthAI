@@ -2,7 +2,7 @@
 Medical History Repository - Manages medical conditions data
 """
 
-from datetime import datetime
+from datetime import datetime, timezone, timezone
 from typing import List, Optional
 
 from sqlalchemy import and_, desc
@@ -96,7 +96,7 @@ class MedicalHistoryRepository(BaseRepository[MedicalCondition]):
             condition = self.get_by_id(condition_id)
             if condition:
                 condition.status = status
-                condition.updated_at = datetime.utcnow()
+                condition.updated_at = datetime.now(timezone.utc)
                 self.db.commit()
                 logger.info(f"Updated condition {condition_id} status to {status}")
                 return condition

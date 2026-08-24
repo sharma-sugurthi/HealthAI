@@ -2,7 +2,7 @@
 Health metric model for tracking user health data.
 """
 
-from datetime import datetime
+from datetime import datetime, timezone, timezone
 
 from sqlalchemy import Column, DateTime, Float, ForeignKey, Index, Integer, String, Text
 from sqlalchemy.orm import relationship
@@ -21,7 +21,7 @@ class HealthMetric(Base):
     value = Column(Float, nullable=False)
     unit = Column(String(20), nullable=False)
     notes = Column(Text)
-    recorded_at = Column(DateTime, default=datetime.utcnow, index=True)
+    recorded_at = Column(DateTime, default=lambda: datetime.now(timezone.utc), index=True)
 
     # Relationships
     user = relationship("User", back_populates="health_metrics")

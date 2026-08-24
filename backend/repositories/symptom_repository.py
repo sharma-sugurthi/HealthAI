@@ -2,7 +2,7 @@
 Symptom Repository - Manages symptom log data
 """
 
-from datetime import datetime, timedelta
+from datetime import datetime, timezone, timezone, timedelta
 from typing import List, Optional
 
 from sqlalchemy import desc
@@ -45,7 +45,7 @@ class SymptomRepository(BaseRepository[SymptomLog]):
     def get_recent_symptoms(self, user_id: int, days: int = 30) -> List[SymptomLog]:
         """Get symptoms from last N days"""
         try:
-            cutoff_date = datetime.utcnow() - timedelta(days=days)
+            cutoff_date = datetime.now(timezone.utc) - timedelta(days=days)
             symptoms = (
                 self.db.query(SymptomLog)
                 .filter(SymptomLog.user_id == user_id, SymptomLog.logged_at >= cutoff_date)

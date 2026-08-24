@@ -2,7 +2,7 @@
 User model for authentication and user management.
 """
 
-from datetime import datetime
+from datetime import datetime, timezone, timezone
 
 import bcrypt
 from sqlalchemy import Column, DateTime, Integer, String
@@ -22,7 +22,7 @@ class User(Base):
     full_name = Column(String(100), nullable=False)
     age = Column(Integer, nullable=False)
     gender = Column(String(20), nullable=False)
-    created_at = Column(DateTime, default=datetime.utcnow)
+    created_at = Column(DateTime, default=lambda: datetime.now(timezone.utc))
 
     # Relationships
     chat_history = relationship("ChatHistory", back_populates="user", cascade="all, delete-orphan")

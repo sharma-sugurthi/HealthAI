@@ -35,7 +35,7 @@ async def record_metric(
         )
         return HealthMetricResponse(**metric)
     except ValidationError as e:
-        raise HTTPException(status_code=status.HTTP_422_UNPROCESSABLE_ENTITY, detail=str(e))
+        raise HTTPException(status_code=status.HTTP_422_UNPROCESSABLE_CONTENT, detail=str(e))
     except Exception as e:
         logger.error(f"Error recording metric: {str(e)}")
         raise HTTPException(
