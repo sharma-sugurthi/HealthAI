@@ -2,7 +2,7 @@
 Chat history model for storing conversation messages.
 """
 
-from datetime import datetime, timezone, timezone
+from datetime import datetime, timezone
 
 from sqlalchemy import Column, DateTime, ForeignKey, Index, Integer, Text
 from sqlalchemy.orm import relationship

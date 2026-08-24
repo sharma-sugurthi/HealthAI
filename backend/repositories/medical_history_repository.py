@@ -2,7 +2,7 @@
 Medical History Repository - Manages medical conditions data
 """
 
-from datetime import datetime, timezone, timezone
+from datetime import datetime, timezone
 from typing import List, Optional
 
 from sqlalchemy import and_, desc

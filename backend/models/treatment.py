@@ -2,7 +2,7 @@
 Treatment plan model for storing user treatment plans.
 """
 
-from datetime import datetime, timezone, timezone
+from datetime import datetime, timezone
 
 from sqlalchemy import Column, DateTime, ForeignKey, Index, Integer, String, Text
 from sqlalchemy.orm import relationship

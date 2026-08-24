@@ -2,7 +2,7 @@
 Symptom Log Models - Detailed symptom tracking over time
 """
 
-from datetime import datetime, timezone, timezone
+from datetime import datetime, timezone
 
 from sqlalchemy import Column, DateTime, ForeignKey, Integer, String, Text
 from sqlalchemy.orm import relationship

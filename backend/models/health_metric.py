@@ -2,7 +2,7 @@
 Health metric model for tracking user health data.
 """
 
-from datetime import datetime, timezone, timezone
+from datetime import datetime, timezone
 
 from sqlalchemy import Column, DateTime, Float, ForeignKey, Index, Integer, String, Text
 from sqlalchemy.orm import relationship

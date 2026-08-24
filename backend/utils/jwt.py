@@ -2,7 +2,7 @@
 JWT utility functions for token generation and validation.
 """
 
-from datetime import datetime, timezone, timezone, timedelta
+from datetime import datetime, timezone, timedelta
 from typing import Dict, Optional
 
 from jose import JWTError, jwt

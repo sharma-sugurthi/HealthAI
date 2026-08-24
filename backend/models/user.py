@@ -2,7 +2,7 @@
 User model for authentication and user management.
 """
 
-from datetime import datetime, timezone, timezone
+from datetime import datetime, timezone
 
 import bcrypt
 from sqlalchemy import Column, DateTime, Integer, String
