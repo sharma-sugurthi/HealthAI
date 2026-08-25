@@ -42,8 +42,6 @@ class DatabaseManager:
                 pool_recycle=config.DB_POOL_RECYCLE,
             )
 
-
-
         # Create session factory
         self.SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=self.engine)
 
