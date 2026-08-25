@@ -1,7 +1,6 @@
 from logging.config import fileConfig
 
-from sqlalchemy import engine_from_config
-from sqlalchemy import pool
+from sqlalchemy import engine_from_config, pool
 
 from alembic import context
 
@@ -14,14 +13,14 @@ config = context.config
 if config.config_file_name is not None:
     fileConfig(config.config_file_name)
 
-import sys
-import os
+import os  # noqa: E402
+import sys  # noqa: E402
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(__file__)))
 
-from config import config as app_config
-import backend.models
-from backend.models.user import Base
+import backend.models  # noqa: E402
+from backend.models.user import Base  # noqa: E402
+from config import config as app_config  # noqa: E402
 
 target_metadata = Base.metadata
 
