@@ -16,7 +16,7 @@ export default function AppShell({ user, onLogout, tab, setTab, children }) {
         <div className="sidebar-brand">
           <div className="brand-logo">H</div>
           <div>
-            <strong>HealthAI</strong>
+            <strong>Susruta</strong>
             <span>AI healthcare workspace</span>
           </div>
         </div>

@@ -132,7 +132,7 @@ class MedicalPromptBuilder:
         for conv in conversations[-3:]:  # Last 3 conversations
             msg = conv.get("message", "")[:100]
             resp = conv.get("response", "")[:150]
-            summaries.append(f"Patient: {msg}...\nDr. HealthAI: {resp}...")
+            summaries.append(f"Patient: {msg}...\nDr. Susruta: {resp}...")
 
         return "\n\n".join(summaries)
 

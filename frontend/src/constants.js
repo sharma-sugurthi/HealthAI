@@ -19,7 +19,7 @@ export const SAMPLE_CONVERSATION = [
   {
     role: 'assistant',
     content:
-      'Hello, I am HealthAI. I can help with symptoms, treatment guidance, and health tracking. How can I help today?',
+      'Hello, I am Susruta. I can help with symptoms, treatment guidance, and health tracking. How can I help today?',
     meta: { tag: 'Assistant' },
   },
 ]

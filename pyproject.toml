@@ -1,7 +1,7 @@
 [project]
-name = "healthai"
+name = "susruta"
 version = "0.1.0"
-description = "HealthAI - Intelligent Healthcare Assistant powered by AI"
+description = "Susruta - Intelligent Healthcare Assistant powered by AI"
 requires-python = ">=3.11"
 dependencies = [
     "bcrypt>=5.0.0",

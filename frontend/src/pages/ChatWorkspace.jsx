@@ -69,7 +69,7 @@ export default function ChatWorkspace({ user }) {
             <div key={index} className={`chat-row ${message.role}`}>
               <div className="chat-bubble">
                 <div className="bubble-meta">
-                  <span>{message.role === 'user' ? user.full_name : 'HealthAI'}</span>
+                  <span>{message.role === 'user' ? user.full_name : 'Susruta'}</span>
                   {message.meta?.tag ? <small>{message.meta.tag}</small> : null}
                 </div>
                 <p>{message.content}</p>

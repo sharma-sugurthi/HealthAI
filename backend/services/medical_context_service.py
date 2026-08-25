@@ -181,7 +181,7 @@ class MedicalContextService:
         for conv in conversations:
             msg = conv.message[:100] if conv.message else ""
             resp = conv.response[:150] if conv.response else ""
-            summary_lines.append(f"Patient: {msg}...\nDr. HealthAI: {resp}...\n")
+            summary_lines.append(f"Patient: {msg}...\nDr. Susruta: {resp}...\n")
 
         return "\n".join(summary_lines)
 

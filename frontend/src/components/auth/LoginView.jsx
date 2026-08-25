@@ -26,7 +26,7 @@ export default function LoginView({ onLogin, onRegister, loading }) {
     <div className="auth-shell">
       <div className="auth-hero">
         <div className="brand-pill">
-          <Sparkles size={14} /> HealthAI
+          <Sparkles size={14} /> Susruta
         </div>
         <h1>Modern AI healthcare workspace</h1>
         <p>

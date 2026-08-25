@@ -1,6 +1,6 @@
-# HealthAI React Frontend
+# Susruta React Frontend
 
-Modern React + Vite frontend for the HealthAI backend API.
+Modern React + Vite frontend for the Susruta backend API.
 
 ## Features
 - Professional chat workspace
@@ -19,4 +19,4 @@ Modern React + Vite frontend for the HealthAI backend API.
 ## Notes
 - The backend API is expected at `http://localhost:8000`.
 - Authentication uses JWT tokens returned by the backend.
-- This is the primary frontend for HealthAI.
+- This is the primary frontend for Susruta.

@@ -1,5 +1,5 @@
 """
-HealthAI FastAPI Application.
+Susruta FastAPI Application.
 Main API entry point with all routers and middleware.
 """
 
@@ -22,7 +22,7 @@ limiter = Limiter(key_func=get_remote_address)
 
 # Create FastAPI app
 app = FastAPI(
-    title="HealthAI API",
+    title="Susruta API",
     description="Intelligent Healthcare Assistant API with Advanced Medical AI (Tier 3)",
     version="2.0.0",
     docs_url="/docs",
@@ -60,7 +60,7 @@ app.include_router(medical_history.router, prefix=config.API_PREFIX)
 async def root():
     """Root endpoint"""
     return {
-        "message": "Welcome to HealthAI API",
+        "message": "Welcome to Susruta API",
         "version": "2.0.0",
         "environment": config.ENVIRONMENT,
         "docs": "/docs",

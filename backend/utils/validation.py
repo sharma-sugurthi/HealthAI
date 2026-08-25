@@ -1,5 +1,5 @@
 """
-Input validation utilities for HealthAI application.
+Input validation utilities for Susruta application.
 Provides sanitization and validation for user inputs.
 """
 

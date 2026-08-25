@@ -13,7 +13,7 @@ logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 
-class HealthAIClient:
+class SusrutaClient:
     """Handles all AI API interactions with error handling and retry logic via OpenRouter"""
 
     def __init__(self, max_retries=None, retry_delay=None):
@@ -100,7 +100,7 @@ class HealthAIClient:
         """Handle patient chat queries"""
 
         system_instruction = (
-            "You are HealthAI, an intelligent healthcare assistant. Your role is to:\n"
+            "You are Susruta, an intelligent healthcare assistant. Your role is to:\n"
             "1. Provide accurate, evidence-based health information\n"
             "2. Be empathetic and supportive\n"
             "3. Always remind users that you are an AI assistant and not a substitute "
@@ -181,10 +181,10 @@ class HealthAIClient:
         return self._make_request(prompt, system_instruction)
 
 
-def get_ai_client() -> Optional[HealthAIClient]:
+def get_ai_client() -> Optional[SusrutaClient]:
     """Factory function to get AI client with error handling"""
     try:
-        return HealthAIClient()
+        return SusrutaClient()
     except Exception as e:
         logger.error(f"Failed to initialize AI client: {str(e)}")
         return None

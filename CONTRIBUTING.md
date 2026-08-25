@@ -1,6 +1,6 @@
-# Contributing to HealthAI
+# Contributing to Susruta
 
-We adhere to strict engineering standards to maintain the stability and security of the HealthAI platform. Please review these guidelines before submitting a pull request.
+We adhere to strict engineering standards to maintain the stability and security of the Susruta platform. Please review these guidelines before submitting a pull request.
 
 ## Development Workflow
 

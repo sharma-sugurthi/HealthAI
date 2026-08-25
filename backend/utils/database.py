@@ -42,10 +42,7 @@ class DatabaseManager:
                 pool_recycle=config.DB_POOL_RECYCLE,
             )
 
-        # Create all tables for dev/test convenience.
-        # In production, prefer migration tools (e.g., Alembic) and set DB_AUTO_CREATE_SCHEMA=false.
-        if config.DB_AUTO_CREATE_SCHEMA:
-            Base.metadata.create_all(self.engine)
+
 
         # Create session factory
         self.SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=self.engine)

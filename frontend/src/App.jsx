@@ -18,7 +18,7 @@ export default function App() {
   const [loading, setLoading] = useState(false)
   const [user, setUser] = useState(null)
   const [tab, setTab] = useState(TABS.chat)
-  const [token, setTokenState] = useState(localStorage.getItem('healthai_token') || '')
+  const [token, setTokenState] = useState(localStorage.getItem('susruta_token') || '')
 
   useEffect(() => {
     if (token) setAuthToken(token)
@@ -32,7 +32,7 @@ export default function App() {
         setUser(me)
       } catch {
         setTokenState('')
-        localStorage.removeItem('healthai_token')
+        localStorage.removeItem('susruta_token')
         setAuthToken(null)
       }
     }
@@ -43,7 +43,7 @@ export default function App() {
     setLoading(true)
     try {
       const data = await loginUser(username, password)
-      localStorage.setItem('healthai_token', data.access_token)
+      localStorage.setItem('susruta_token', data.access_token)
       setTokenState(data.access_token)
       setAuthToken(data.access_token)
       const me = await getMe()
@@ -70,7 +70,7 @@ export default function App() {
   }
 
   const handleLogout = () => {
-    localStorage.removeItem('healthai_token')
+    localStorage.removeItem('susruta_token')
     setAuthToken(null)
     setUser(null)
     setTokenState('')

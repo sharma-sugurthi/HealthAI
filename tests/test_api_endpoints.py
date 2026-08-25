@@ -133,7 +133,7 @@ def test_root_endpoint_reports_environment():
 
     assert response.status_code == 200
     body = response.json()
-    assert body["message"] == "Welcome to HealthAI API"
+    assert body["message"] == "Welcome to Susruta API"
     assert body["version"] == "2.0.0"
     assert "environment" in body
     assert "api_prefix" in body

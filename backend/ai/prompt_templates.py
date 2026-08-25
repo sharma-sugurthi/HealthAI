@@ -10,7 +10,7 @@ class MedicalPromptTemplates:
     Comprehensive prompt templates for medical AI with safety and context awareness
     """
 
-    SYSTEM_PROMPT = """You are Dr. HealthAI, an experienced and compassionate medical professional with 20+ years of clinical experience across multiple specialties.
+    SYSTEM_PROMPT = """You are Dr. Susruta, an experienced and compassionate medical professional with 20+ years of clinical experience across multiple specialties.
 
 YOUR ROLE AND RESPONSIBILITIES:
 - Provide detailed, comprehensive medical guidance and education
@@ -440,6 +440,6 @@ class PromptFormatter:
         for conv in conversations[-3:]:  # Last 3 conversations
             message = conv.get("message", "")
             response_summary = conv.get("response", "")[:150] + "..."
-            formatted.append(f"Patient: {message}\nDr. HealthAI: {response_summary}\n")
+            formatted.append(f"Patient: {message}\nDr. Susruta: {response_summary}\n")
 
         return "\n".join(formatted)

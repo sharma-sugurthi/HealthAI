@@ -16,12 +16,12 @@ class Config:
     """Application configuration class"""
 
     # Application Settings
-    APP_NAME: str = os.getenv("APP_NAME", "HealthAI")
+    APP_NAME: str = os.getenv("APP_NAME", "Susruta")
     ENVIRONMENT: str = os.getenv("ENVIRONMENT", "development")
     DEBUG: bool = os.getenv("DEBUG", "False").lower() == "true"
 
     # Database Settings
-    DATABASE_URL: str = os.getenv("DATABASE_URL", "sqlite:///healthai.db")
+    DATABASE_URL: str = os.getenv("DATABASE_URL", "sqlite:///susruta.db")
     DB_POOL_SIZE: int = int(os.getenv("DB_POOL_SIZE", "10"))
     DB_MAX_OVERFLOW: int = int(os.getenv("DB_MAX_OVERFLOW", "20"))
     DB_POOL_RECYCLE: int = int(os.getenv("DB_POOL_RECYCLE", "3600"))
@@ -39,8 +39,8 @@ class Config:
     # OpenRouter API Settings
     OPENROUTER_API_KEY: Optional[str] = os.getenv("OPENROUTER_API_KEY")
     OPENROUTER_BASE_URL: str = os.getenv("OPENROUTER_BASE_URL", "https://openrouter.ai/api/v1")
-    OPENROUTER_REFERER: str = os.getenv("OPENROUTER_REFERER", "https://healthai.app")
-    OPENROUTER_TITLE: str = os.getenv("OPENROUTER_TITLE", "HealthAI Assistant")
+    OPENROUTER_REFERER: str = os.getenv("OPENROUTER_REFERER", "https://susruta.app")
+    OPENROUTER_TITLE: str = os.getenv("OPENROUTER_TITLE", "Susruta Assistant")
 
     # AI Model Settings
     AI_MODEL: str = os.getenv("AI_MODEL", "qwen/qwen3.6-plus-preview:free")
@@ -51,7 +51,7 @@ class Config:
 
     # Logging Settings
     LOG_LEVEL: str = os.getenv("LOG_LEVEL", "INFO")
-    LOG_FILE: str = os.getenv("LOG_FILE", "logs/healthai.log")
+    LOG_FILE: str = os.getenv("LOG_FILE", "logs/susruta.log")
 
     # API Settings
     API_HOST: str = os.getenv("API_HOST", "0.0.0.0")

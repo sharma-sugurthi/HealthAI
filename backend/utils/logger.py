@@ -78,4 +78,4 @@ def get_logger(name: str) -> logging.Logger:
 
 
 # Create a default application logger
-app_logger = get_logger("healthai")
+app_logger = get_logger("susruta")

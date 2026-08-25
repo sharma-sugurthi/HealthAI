@@ -1,12 +1,12 @@
-# HealthAI - Intelligent Healthcare Assistant
+# Susruta - Intelligent Healthcare Assistant
 
-An enterprise-grade, API-first healthcare platform that provides AI-driven medical context analysis, symptom evaluation, and personalized treatment plan generation. 
+An API-first healthcare platform built with production practices that provides AI-driven medical context analysis, symptom evaluation, and personalized treatment plan generation. 
 
-Built with scalability, security, and medical data integrity in mind, HealthAI leverages FastAPI for high-performance backend routing, PostgreSQL for robust data persistence, and React (Vite) for a responsive frontend client.
+Built with scalability, security, and medical data integrity in mind, Susruta leverages FastAPI for high-performance backend routing, PostgreSQL for robust data persistence, and React (Vite) for a responsive frontend client.
 
 ## System Architecture
 
-HealthAI is designed as a decoupled, multi-tier system:
+Susruta is designed as a decoupled, multi-tier system:
 
 - **Core API Layer**: FastAPI-driven REST endpoints with strict validation, rate limiting (`slowapi`), and structured JSON responses.
 - **Domain Service Layer**: Abstracted business logic (e.g., `EnhancedChatService`, `MedicalContextService`) orchestrating AI interactions and database transactions.

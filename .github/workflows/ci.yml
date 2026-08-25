@@ -51,7 +51,7 @@ jobs:
       postgres:
         image: postgres:15
         env:
-          POSTGRES_DB: healthai_test
+          POSTGRES_DB: susruta_test
           POSTGRES_USER: test
           POSTGRES_PASSWORD: test
         options: >-
@@ -86,7 +86,7 @@ jobs:
     
     - name: Run tests with coverage
       env:
-        DATABASE_URL: postgresql://test:test@localhost:5432/healthai_test
+        DATABASE_URL: postgresql://test:test@localhost:5432/susruta_test
         ENVIRONMENT: testing
         SECRET_KEY: test-secret-key
       run: |
@@ -113,7 +113,7 @@ jobs:
     
     - name: Build Docker image
       run: |
-        docker build -t healthai:latest .
+        docker build -t susruta:latest .
 
   deploy:
     name: Deploy (Placeholder)
